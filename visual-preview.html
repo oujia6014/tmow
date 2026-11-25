@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T-MOW 1.4 视觉样板</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="theme-1.4.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #DFE4EB;
+    color: #14171C;
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    padding: 24px 28px 44px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; border: none; background: none; color: inherit; }
+
+  /* 顶部评审台 */
+  .review-bar {
+    max-width: 1740px;
+    margin: 0 auto 24px;
+    background: #FFFFFF;
+    border: 1px solid #D1D8E2;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(17, 19, 23, 0.05);
+  }
+  .review-brand h1 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .review-brand .tag-14 {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #EEF2F7;
+    color: #14171C;
+    border: 1px solid #CFD7E2;
+    border-bottom: 2px solid #F08300;
+  }
+  .nav-pill-btn {
+    font-size: 12px;
+    font-weight: 600;
+    color: #14171C;
+    text-decoration: none;
+    padding: 7px 11px;
+    border-radius: 9px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+  }
+  .nav-pill-btn:hover { background: #F3F5F8; }
+  .nav-pill-btn.primary {
+    background: #1E232B;
+    color: #FFFFFF;
+    border-color: #1E232B;
+  }
+  .review-brand p {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #5B6470;
+  }
+  .review-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+  }
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #F3F5F8;
+    border: 1px solid #DCE2E8;
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .ctrl-group .lbl {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5B6470;
+    padding: 0 6px;
+  }
+  .ctrl-group button {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 11px;
+    border-radius: 7px;
+    color: #5B6470;
+    cursor: pointer;
+    transition: all 0.14s;
+  }
+  .ctrl-group button:hover { color: #14171C; }
+  .ctrl-group button.on {
+    background: #181B20;
+    color: #FFFFFF;
+  }
+
+  /* 手机画布排列 */
+  .stage-grid {
+    max-width: 1740px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 414px);
+    justify-content: center;
+    gap: 24px;
+  }
+  .stage-grid.single {
+    grid-template-columns: 414px;
+  }
+  @media (max-width: 1760px) {
+    .stage-grid:not(.single) {
+      grid-template-columns: repeat(2, 414px);
+    }
+  }
+  @media (max-width: 900px) {
+    .stage-grid:not(.single) {
+      grid-template-columns: 414px;
+    }
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .phone-col-head {
+    width: 100%;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .phone-col-head .name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #14171C;
+  }
+  .phone-col-head .desc {
+    font-size: 11px;
+    color: #5B6470;
+  }
+  .device-chassis {
+    background: #14161A;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 26px 56px -18px rgba(17, 19, 23, 0.34),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  /* 评审 toast */
+  .proto-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #181B20;
+    color: #FFFFFF;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 12px 30px rgba(17, 19, 23, 0.25);
+    border-bottom: 2px solid #F08300;
+    z-index: 999;
+  }
+</style>
+</head>
+<body class="theme-14">
+
+<header class="review-bar">
+  <div class="review-brand">
+    <h1>T-MOW 1.4 视觉样板 <span class="tag-14">新版界面</span></h1>
+    <p>全浅色冷钛银与瓷白界面体系 · 展示启动页、登录认证、首页控制与设备自检 4 个核心页面效果。</p>
+  </div>
+  <div class="review-controls">
+    <div class="ctrl-group" id="themeSwitch">
+      <span class="lbl">界面版本</span>
+      <button class="on" data-theme="theme-14">1.4 新版</button>
+      <button data-theme="theme-13">1.3 旧版</button>
+      <button data-theme="theme-v1">早期绿色</button>
+    </div>
+    <div class="ctrl-group" id="layoutSwitch">
+      <span class="lbl">视图</span>
+      <button class="on" data-layout="grid">4 屏并排</button>
+      <button data-layout="single">单屏聚焦</button>
+    </div>
+    <div class="ctrl-group" id="homeSwitch">
+      <span class="lbl">首页状态</span>
+      <button class="on" data-home="idle">待机充电</button>
+      <button data-home="mowing">割草进行中</button>
+      <button data-home="blocked">区域受阻弹窗</button>
+      <button data-home="offline">离线</button>
+    </div>
+    <div class="ctrl-group" id="p4Switch">
+      <span class="lbl">第 4 屏</span>
+      <button class="on" data-p4="settings">设备设置</button>
+      <button data-p4="selfcheck">设备自检</button>
+      <button data-p4="selfcheckErr">自检异常</button>
+      <button data-p4="history">自检历史</button>
+    </div>
+    <a class="nav-pill-btn primary" href="index.html">打开完整原型 ↗</a>
+    <a class="nav-pill-btn" href="flow.html">流程总览</a>
+    <a class="nav-pill-btn" href="home-pick.html">首页组合选型</a>
+  </div>
+</header>
+
+<main class="stage-grid" id="stage"></main>
+
+<script>
+const IMG = 'assets/';
+const ICO = {
+  back: '<path d="m15 6-6 6 6 6"/>',
+  right: '<path d="m9 6 6 6-6 6"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  play: '<path d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7z" fill="currentColor" stroke="none"/>',
+  pause: '<rect x="6.5" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/>',
+  home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5.5h-6V20H5a1 1 0 0 1-1-1z"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/>',
+  msg: '<path d="M5 5h14a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h7"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  map: '<path d="M3 6.5 8.5 4l7 2.5L21 4v13.5L15.5 20l-7-2.5L3 20z"/><path d="M8.5 4v13.5M15.5 6.5V20"/>',
+  pad: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="13.8" r=".7" fill="currentColor"/>',
+  dock: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  mail: '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/>',
+  blade: '<circle cx="12" cy="12" r="2"/><path d="M12 10c0-3 1.5-5.5 4-6.5M14 12c3 0 5.5 1.5 6.5 4M12 14c0 3-1.5 5.5-4 6.5M10 12c-3 0-5.5-1.5-6.5-4"/>',
+  dropmow: '<g><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(120 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(240 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/>',
+  pulse: '<path d="M3 12h4l2.5-6 4 12 2.5-6H21"/>',
+  upgrade: '<path d="M12 16V5M7.5 9.5 12 5l4.5 4.5"/><path d="M5 19.5h14"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.1"/>',
+  locate: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
+  lora: '<path d="M6 15a6 6 0 0 1 0-6M18 9a6 6 0 0 1 0 6M9 13.5a2.5 2.5 0 0 1 0-3M15 10.5a2.5 2.5 0 0 1 0 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+  users: '<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c1-3 3.2-4.6 5.5-4.6s4.5 1.6 5.5 4.6"/><path d="M16 11.5a2.5 2.5 0 1 0 0-5M17.5 14.8c1.7.4 3 1.8 3.5 4.2"/>',
+  records: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  alert: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+  wifi: '<path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0"/><circle cx="12" cy="19.2" r="1" fill="currentColor" stroke="none"/>',
+  history: '<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v3.8h3.8"/><path d="M12 8v4l3 2"/>',
+};
+const ic = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24">${ICO[name]}</svg>`;
+
+function signalBars(n = 4) {
+  return `<svg class="ico sm" viewBox="0 0 24 24">${[0,1,2,3].map(i =>
+    `<rect x="${3 + i*5}" y="${16 - i*3.5}" width="3" height="${4 + i*3.5}" rx="1" fill="${i < n ? 'currentColor' : 'none'}" stroke="${i < n ? 'none' : 'currentColor'}" stroke-width="1.2" opacity="${i < n ? 1 : .35}"/>`).join('')}</svg>`;
+}
+function statusbar() {
+  return `<div class="sb"><span>9:41</span><span class="sb-icons">${signalBars(4)}${ic('wifi', 'sm')}<svg class="ico sm" viewBox="0 0 24 24" style="width:22px"><rect x="2" y="7" width="18" height="10" rx="2.5"/><path d="M22 10.5v3"/><rect x="4" y="9" width="13" height="6" rx="1" fill="currentColor" stroke="none"/></svg></span></div>`;
+}
+
+const STATE = {
+  theme: 'theme-14',
+  layout: 'grid',
+  focusScreen: 'home',
+  authTab: 'password',
+  pwdVisible: false,
+  agreed: true,
+  homeState: 'idle',    // idle | mowing | blocked | offline
+  dropmowMode: false,
+  homeModal: null,      // null | signal | dockConfirm | switchDev | privacy | dropmow
+  dockClearTask: true,
+  dockAutoResume: false,
+  p4Mode: 'settings',   // settings | selfcheck | selfcheckErr | history
+  expandedCats: { chassis: true, sensors: true },
+};
+
+/* ---------- 屏 1：启动页 ---------- */
+function renderSplash() {
+  return `
+  <div class="phone-screen">
+    <div class="splash-screen" style="padding:138px 28px 46px">
+      ${statusbar()}
+      <div class="splash-stage">
+        <div class="stage-halo"></div>
+        <img class="mower-hero" src="${IMG}add/device_product_large.png" alt="T-MOW 智能割草机器人">
+        <div class="ground-shadow"></div>
+      </div>
+      <div class="splash-brand">
+        <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+        <div class="pulse-track"><div class="pulse-line animated"></div></div>
+        <div class="splash-foot">SMART LAWN ROBOTICS</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 屏 2：登录页（1.4-1） ---------- */
+function renderLogin() {
+  const isPwd = STATE.authTab === 'password';
+  return `
+  <div class="phone-screen">
+    <div class="auth-screen">
+      ${statusbar()}
+      <div class="auth-scroll">
+        <div class="auth-brand-row">
+          <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+        </div>
+        <div class="auth-accent-anchor"></div>
+        <div class="auth-title">欢迎使用 T-MOW</div>
+        <div class="auth-sub">连接你的智能割草机器人，管理庭院地图与自动作业计划。</div>
+
+        <div class="auth-seg">
+          <button class="${isPwd ? 'on' : ''}" data-act="authTab" data-val="password">密码登录</button>
+          <button class="${!isPwd ? 'on' : ''}" data-act="authTab" data-val="code">验证码登录</button>
+        </div>
+
+        <div class="auth-form">
+          <div>
+            <label class="f-label">邮箱账号</label>
+            <div class="f-input-box">
+              ${ic('mail', 'sm')}
+              <input type="email" value="owen.li@tmow-garden.com" aria-label="邮箱账号">
+            </div>
+          </div>
+          ${isPwd ? `
+          <div>
+            <label class="f-label">登录密码</label>
+            <div class="f-input-box">
+              ${ic('lock', 'sm')}
+              <input type="${STATE.pwdVisible ? 'text' : 'password'}" value="Garden2026!" aria-label="登录密码">
+              <button data-act="togglePwd" aria-label="切换密码显示" style="color:var(--text-secondary);cursor:pointer">${ic('eye', 'sm')}</button>
+            </div>
+            <div class="f-hint">8–20 位字符，需包含字母与数字</div>
+          </div>` : `
+          <div>
+            <label class="f-label">邮箱验证码</label>
+            <div class="f-input-box">
+              ${ic('pulse', 'sm')}
+              <input type="text" placeholder="请输入 6 位验证码" value="482910" aria-label="邮箱验证码">
+              <button class="code-send-btn" data-act="toast" data-msg="验证码已发送至邮箱">重新发送 52s</button>
+            </div>
+            <div class="f-hint">验证码 5 分钟内有效</div>
+          </div>`}
+
+          <div class="agree-row" data-act="toggleAgree">
+            <span class="chk-box ${STATE.agreed ? 'on' : ''}">${STATE.agreed ? ic('check', 'sm') : ''}</span>
+            <span>我已阅读并同意 <span class="doc-link" data-act="openPrivacy">《用户协议》与《隐私政策》</span></span>
+          </div>
+
+          <button class="p-btn p-btn-primary has-13-arrow" style="width:100%;margin-top:6px" ${STATE.agreed ? '' : 'disabled'} data-act="toast" data-msg="登录成功，进入设备首页">登录</button>
+        </div>
+
+        <div class="auth-footer">
+          <button data-act="toast" data-msg="进入重置密码流程">忘记密码？</button>
+          <button data-act="toast" data-msg="进入注册新账号流程">没有账号？<strong>立即注册</strong></button>
+        </div>
+      </div>
+      ${STATE.homeModal === 'privacy' ? renderPrivacySheet() : ''}
+    </div>
+  </div>`;
+}
+
+function renderPrivacySheet() {
+  return `
+  <div class="overlay-scrim bottom" data-act="closeModal">
+    <div class="sheet-card">
+      <div class="sheet-grab"></div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">隐私政策摘要（登录前可阅）</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.65;margin-bottom:16px">
+        账号凭据仅存放于系统安全存储（Keychain / Keystore）；蓝牙配网传入的 Wi-Fi 密码脱敏处理且不落明文日志；庭院地图与作业轨迹仅在授权账号与绑定设备间同步。
+      </div>
+      <button class="p-btn p-btn-primary" style="width:100%" data-act="closeModal">我已了解</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- 屏 3：首页智控台（定稿组合 B：3 顶栏 + 全画幅庭院地图 + 居中胶囊 & 右侧错层 + 双栏遥测控台） ---------- */
+function renderHomeMap(mowing, offline) {
+  const Z1 = 'M26 168 C 92 142, 248 130, 362 142 C 378 182, 382 242, 374 282 C 296 292, 120 292, 28 290 C 16 254, 16 206, 26 168Z';
+  const Z2 = 'M28 408 C 120 406, 228 406, 296 408 C 336 408, 366 412, 378 420 C 386 468, 384 516, 372 560 C 276 574, 120 576, 36 564 C 20 516, 18 456, 28 408Z';
+  const Z3 = 'M308 302 C 336 298, 360 298, 376 304 C 382 338, 382 368, 376 398 C 354 402, 330 402, 308 398 C 302 368, 302 328, 308 302Z';
+  let dots = '';
+  const step = 8.2, tile = step * 6;
+  for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) {
+    let h = (c * 73856093 ^ r * 19349663) >>> 0;
+    h = ((h ^ (h >>> 13)) * 1274126177) >>> 0;
+    if (h % 3) continue;
+    const x = (c + .5) * step + ((h % 7) - 3) * step * .12;
+    const y = (r + .5) * step + (((h / 7 | 0) % 5) - 2) * step * .12;
+    const rr = 1.6 * (.65 + (h % 4) * .12);
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr.toFixed(2)}" fill="${h % 2 ? '#9DBF95' : '#FFFFFF'}" opacity="${h % 2 ? 0.14 : 0.28}"/>`;
+  }
+  const pts = [];
+  for (let i = 0; i <= 9; i++) {
+    const y = 148 + i * 10;
+    const a = `14 ${y}`, b = `388 ${y - 6}`;
+    pts.push(...(i % 2 ? [b, a] : [a, b]));
+  }
+  const zone = d => `
+    <path d="${d}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <path d="${d}" fill="#DDEDD9"/>
+    <path d="${d}" fill="url(#vpGrass)"/>
+    <path d="${d}" fill="none" stroke="#5E8F55" stroke-width="1.2" stroke-dasharray="2.5 2.5"/>`;
+  const robotPos = mowing ? [302, 232] : [76, 348];
+  return `
+  <svg viewBox="-12 40 422 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <clipPath id="vpClipZ1"><path d="${Z1}"/></clipPath>
+      <pattern id="vpGrass" width="${tile}" height="${tile}" patternUnits="userSpaceOnUse">${dots}</pattern>
+      <pattern id="vpGrid" width="18" height="18" patternUnits="userSpaceOnUse">
+        <circle cx="9" cy="9" r="0.95" fill="#B9C3B8" fill-opacity="0.45"/>
+      </pattern>
+    </defs>
+    <rect x="-80" y="-80" width="560" height="1000" fill="#F2F5F2"/>
+    <rect x="-80" y="-80" width="560" height="1000" fill="url(#vpGrid)"/>
+    <path d="M74 286 L74 412" fill="none" stroke="#D8DBD0" stroke-opacity="0.82" stroke-width="20" stroke-linecap="round"/>
+    <path d="M74 286 L74 412" fill="none" stroke="#A9B09E" stroke-width="2.2" stroke-dasharray="5.5 6.5" stroke-linecap="round"/>
+    ${zone(Z1)}${zone(Z2)}${zone(Z3)}
+    ${mowing ? `<g clip-path="url(#vpClipZ1)"><polyline points="${pts.join(' ')}" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : ''}
+    <g font-family="var(--font-ui)" text-anchor="middle">
+      <text x="196" y="218" font-size="14" font-weight="700" fill="#325330">区域 1</text>
+      <text x="196" y="234" font-size="10.5" font-weight="600" fill="#4D754A" class="num">118 ㎡</text>
+      <text x="200" y="486" font-size="14" font-weight="700" fill="#325330">区域 2</text>
+      <text x="200" y="502" font-size="10.5" font-weight="600" fill="#4D754A" class="num">52 ㎡</text>
+      <text x="342" y="352" font-size="12" font-weight="700" fill="#325330">侧院</text>
+    </g>
+    <g transform="translate(124 348)">
+      <rect x="-13" y="-13" width="26" height="26" rx="7" fill="#FFFFFF" stroke="#5E8F55" stroke-opacity="0.35" stroke-width="1.2"/>
+      <image href="${IMG}device/icon_device_charge_station.png" x="-11" y="-11" width="22" height="22"/>
+    </g>
+    <g transform="translate(${robotPos[0]} ${robotPos[1]}) rotate(${mowing ? 78 : 0})" ${offline ? 'opacity="0.45"' : ''}>
+      ${mowing ? `<circle r="27" fill="#FFFFFF" fill-opacity="0.48" stroke="#168A3A" stroke-opacity="0.32" stroke-width="1.2"/>` : ''}
+      <circle r="21" fill="#FFFFFF" fill-opacity="0.88"/>
+      <image href="${IMG}device/device_selfcheck_product.png" x="-14" y="-19" width="28" height="38"/>
+    </g>
+  </svg>`;
+}
+
+function renderHome() {
+  const st = STATE.homeState;
+  const mowing = st === 'mowing' || st === 'blocked';
+  const offline = st === 'offline';
+  const blocked = st === 'blocked';
+  const dm = STATE.dropmowMode && st === 'mowing';
+
+  const meta = {
+    idle:    { dot: 'ok',   title: '正在充电', bat: 86, sig: 'Wi-Fi', range: '区域 1~3' },
+    mowing:  { dot: 'ok',   title: dm ? 'Dropmow 割草中' : '正在割草', bat: 74, sig: 'Wi-Fi', range: dm ? '即放即割' : '区域 1~3' },
+    blocked: { dot: 'bad',  title: '区域阻挡', bat: 71, sig: 'Wi-Fi', range: '区域 1 受阻' },
+    offline: { dot: 'off',  title: '设备离线', bat: 0,  sig: '离线',  range: '最后在线 10:32' },
+  }[st];
+
+  return `
+  <div class="phone-screen">
+    <div class="hp-home">
+      ${statusbar()}
+      <div class="hp-home-map">${renderHomeMap(mowing, offline)}</div>
+      <div class="hp-top-scrim"></div>
+
+      <div class="hp-topbar">
+        <button class="v3-brandpill" data-act="openModal" data-val="switchDev">
+          <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+          <span class="sep"></span>
+          <span class="name"><span class="status-dot ${meta.dot}"></span>后院割草机 ${ic('down', 'sm')}</span>
+        </button>
+        <div class="v3-fab-pair">
+          <button class="v3-sq-fab" data-act="toast" data-msg="消息中心（3 条未读）" aria-label="消息中心">${ic('msg', 'sm')}<span class="dot"></span></button>
+          <button class="v3-sq-fab" data-act="goSettings" aria-label="设备设置">${ic('gear', 'sm')}</button>
+        </div>
+      </div>
+
+      <div class="hp-bottom-dock">
+        <div class="hp-map-controls">
+          <div class="hp-left-rail">
+            <button class="hp-dropmow-pill dropmow-hero" ${st !== 'idle' ? 'disabled' : ''} title="Dropmow 即放即割一键启动" data-act="openModal" data-val="dropmow"><span class="dm-wing">${ic('dropmow', 'sm')}</span><span>Dropmow</span></button>
+          </div>
+
+          <div class="hp-right-dock">
+            <button class="num" ${offline ? 'disabled' : ''} title="刀盘高度 50mm" data-act="toast" data-msg="调整刀盘高度 50mm">${ic('blade', 'sm')}<span>50mm</span></button>
+            <button title="进入地图管理（114 切换 / 重命名 / 删图补偿）" data-act="toast" data-msg="进入地图管理（114 切换 / 重命名 / 删图补偿）">${ic('map', 'sm')}<span>地图</span></button>
+            <button ${offline ? 'disabled' : ''} title="手动遥控（车体 / 地图双模式）" data-act="toast" data-msg="手动遥控（车体 / 地图双模式）">${ic('pad', 'sm')}<span>遥控</span></button>
+            <button title="镜头回到机器人位置" data-act="toast" data-msg="镜头回到机器人位置">${ic('locate', 'sm')}<span>定位</span></button>
+          </div>
+        </div>
+
+        <section class="v3-panel">
+          <div class="v3-tele-bar">
+            <div style="display:flex;align-items:center;gap:7px">
+              <span class="status-dot ${meta.dot}"></span>
+              <strong style="font-size:15px">${meta.title}</strong>
+              ${dm ? '<span class="dm-tag">即放即割</span>' : `<span style="font-size:11.5px;color:#5B6470">· ${meta.range}</span>`}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="hp-sig-chip" data-act="openModal" data-val="signal">${signalBars(offline ? 0 : 4)}<span>${meta.sig}</span></button>
+              <span class="hp-bat-pill"><svg viewBox="0 0 24 14" fill="none"><rect x="1" y="1.5" width="19" height="11" rx="2.5" stroke="#8C96A4" stroke-width="1.3"/><path d="M21.5 5v4" stroke="#8C96A4" stroke-width="1.5" stroke-linecap="round"/>${!offline ? `<rect x="3" y="3.5" width="${(meta.bat*0.14).toFixed(1)}" height="7" rx="1.2" fill="#199459"/>` : ''}${st === 'idle' ? `<path d="M11.2 2.5L8.4 7.3h2.3l-.9 4.2 3.8-5.1h-2.4z" fill="#FFFFFF" stroke="#16794B" stroke-width="0.6"/>` : ''}</svg><span class="num" style="font-size:18px;font-weight:700">${offline ? '--' : meta.bat}${offline ? '' : '<small style="font-size:11px;color:#5B6470">%</small>'}</span></span>
+            </div>
+          </div>
+
+          <div class="v3-body">
+            ${mowing ? `
+              <div class="hp-mow-box">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                  <span style="color:#325330;font-weight:600">103 分区实时进度 · 剩余 38 分</span>
+                  <strong class="num">76 / 170 ㎡ · 45%</strong>
+                </div>
+                <div class="hp-mow-bar"><i style="width:45%"></i></div>
+              </div>` : `
+              <div class="v3-two-cols">
+                <button class="v3-stat-box tone-green" data-act="toast" data-msg="查看上次割草记录详情">
+                  <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 14L40 8M8 24L42 18M6 34L40 28M10 42L36 38"/></svg>
+                  <div class="stat-top">
+                    <span class="stat-ico">${ic('records', 'sm')}</span>
+                    <span class="k">上次割草</span>
+                    <span class="stat-pill ok">完成</span>
+                    <span class="stat-arr">›</span>
+                  </div>
+                  <div class="v num">周二 · 170 ㎡</div>
+                  <div class="stat-foot"><span class="stat-mini-bar"><i style="width:100%"></i></span><span class="stat-foot-txt">1小时12分</span></div>
+                </button>
+                <button class="v3-stat-box tone-amber" data-act="toast" data-msg="查看 / 管理预约计划">
+                  <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="26" cy="26" r="17" stroke-dasharray="3 4"/><path d="M26 16v10l7 4"/></svg>
+                  <div class="stat-top">
+                    <span class="stat-ico">${ic('cal', 'sm')}</span>
+                    <span class="k">下次定时</span>
+                    <span class="stat-arr">›</span>
+                  </div>
+                  <div class="v num">周三 07:30</div>
+                  <div class="stat-foot"><div class="stat-days"><i class="on">一</i><i>二</i><i class="on">三</i><i>四</i><i class="on">五</i><i>六</i><i>日</i></div></div>
+                </button>
+              </div>`}
+
+            <div class="v3-actions">
+              ${st === 'idle' ? `
+                <button class="v3-cta-main" data-act="setHome" data-val="mowing"><span class="wing">${ic('play', 'sm')}</span><span class="txt">开始割草</span></button>
+              ` : st === 'mowing' ? `
+                <button class="v3-cta-main" data-act="toast" data-msg="已下发暂停指令，等待设备确认"><span class="wing">${ic('pause', 'sm')}</span><span class="txt">暂停作业</span></button>
+                <button class="v1-btn-sq" title="返回充电桩 107" data-act="openModal" data-val="dockConfirm">${ic('dock')}</button>
+              ` : st === 'blocked' ? `
+                <button class="v3-cta-main danger" data-act="toast" data-msg="请处理区域阻挡弹窗"><span class="wing">${ic('alert', 'sm')}</span><span class="txt">处理阻挡</span></button>
+                <button class="v1-btn-sq" title="返回充电桩 107" data-act="openModal" data-val="dockConfirm">${ic('dock')}</button>
+              ` : `
+                <button class="v3-cta-main" disabled><span class="wing">${ic('play', 'sm')}</span><span class="txt">开始割草</span></button>
+              `}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <nav class="bento-tabs">
+        <button class="on" data-act="toast" data-msg="当前在首页">${ic('home')}<span>首页</span></button>
+        <button data-act="toast" data-msg="切换到我的（含帮助反馈/隐私/清缓存）">${ic('user')}<span>我的</span></button>
+      </nav>
+
+      ${blocked ? renderBlockedModal() : ''}
+      ${STATE.homeModal === 'signal' ? renderSignalModal() : ''}
+      ${STATE.homeModal === 'dockConfirm' ? renderDockConfirmModal() : ''}
+      ${STATE.homeModal === 'switchDev' ? renderSwitchSheet() : ''}
+      ${STATE.homeModal === 'dropmow' ? renderDropmowModal() : ''}
+    </div>
+  </div>`;
+}
+
+function renderDropmowModal() {
+  return `
+  <div class="overlay-scrim" data-act="closeModal">
+    <div class="modal-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="width:40px;height:40px;border-radius:12px;background:#FFF4E6;color:#D97706;border:1px solid rgba(240,131,0,.28);display:inline-flex;align-items:center;justify-content:center">${ic('dropmow')}</span>
+        <div>
+          <div style="font-size:16px;font-weight:700">Dropmow 一键启动</div>
+          <div style="font-size:12px;color:var(--text-secondary)">即放即割 · 无需预建图与选区</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:12px">
+        请确认已将割草机平稳放置在目标独立草坪内，启动后设备将自主感知边界并直接开割。
+      </div>
+      <div class="list-card" style="margin-bottom:16px">
+        <div class="list-row"><span class="row-body"><span class="row-title">草坪已清理石块与低矮障碍</span></span><span class="s-pill ok">确认</span></div>
+        <div class="list-row"><span class="row-body"><span class="row-title">人员与宠物已远离作业区域</span></span><span class="s-pill ok">确认</span></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="p-btn p-btn-secondary" style="flex:1" data-act="closeModal">取消</button>
+        <button class="p-btn p-btn-primary" style="flex:1" data-act="startDropmow">${ic('dropmow', 'sm')}立即启动</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBlockedModal() {
+  return `
+  <div class="overlay-scrim" style="padding:18px">
+    <div class="modal-card" style="padding:28px 22px 24px;border-radius:26px;text-align:center">
+      <div style="height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+        <img src="${IMG}add/device_product_large.png" alt="T-MOW 割草机" style="width:184px;height:auto;object-fit:contain">
+      </div>
+      <div style="font-size:19px;font-weight:700;color:#14171C">区域 1 无法通行</div>
+      <div style="font-size:13.5px;color:#5B6470;line-height:1.6;margin:8px auto 24px;max-width:266px">设备连续避障未果，已停机并关闭刀盘。请确认周围无障碍后再继续。</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <button class="p-btn p-btn-secondary" style="height:46px;border-radius:14px;background:#F3F5F8;border:0" data-act="setHome" data-val="mowing">跳过区域 1</button>
+          <button class="p-btn p-btn-secondary" style="height:46px;border-radius:14px;background:#F3F5F8;border:0;color:#C22736" data-act="setHome" data-val="idle">结束割草</button>
+        </div>
+        <button class="p-btn p-btn-primary" style="width:100%;height:50px;border-radius:14px;font-size:15px" data-act="setHome" data-val="mowing">已清障，继续割草</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSignalModal() {
+  return `
+  <div class="overlay-scrim" data-act="closeModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span style="font-size:16px;font-weight:700">信号与网络详情（id:12）</span>
+        <button class="icon-hit" style="width:32px;height:32px" data-act="closeModal">${ic('close', 'sm')}</button>
+      </div>
+      <div class="list-card" style="margin-bottom:14px">
+        <div class="list-row"><span class="row-body"><span class="row-title">当前网络通道</span></span><span class="s-pill ok">Wi-Fi · Home-5G</span></div>
+        <div class="list-row"><span class="row-body"><span class="row-title">信号强度</span></span><span class="num" style="font-weight:700">88%</span></div>
+        <div class="list-row"><span class="row-body"><span class="row-title">上行 / 下行速率</span></span><span class="num" style="font-size:13px;color:var(--text-secondary)">↑ 124 · ↓ 318 kB/s</span></div>
+        <div class="list-row"><span class="row-body"><span class="row-title">通信配件 S3 LoRa</span></span><span class="s-pill ok">已配对 · 信号强</span></div>
+      </div>
+      <button class="p-btn p-btn-primary" style="width:100%" data-act="closeModal">关闭</button>
+    </div>
+  </div>`;
+}
+
+function renderDockConfirmModal() {
+  return `
+  <div class="overlay-scrim" data-act="closeModal">
+    <div class="modal-card">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">确认返回充电桩？（107）</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:14px">
+        确定让机器人返回充电桩吗？可选择是否结束当前割草任务。
+      </div>
+      <div class="list-card" style="margin-bottom:16px">
+        <div class="list-row" data-act="toggleDockClear">
+          <div class="row-body">
+            <div class="row-title">结束当前任务</div>
+            <div class="row-sub">清除进度，充电后不自动续割</div>
+          </div>
+          <span class="p-switch ${STATE.dockClearTask ? 'on' : ''}"></span>
+        </div>
+        <div class="list-row" style="${STATE.dockClearTask ? 'opacity:.45' : ''}" data-act="toggleDockAuto">
+          <div class="row-body">
+            <div class="row-title">充电完成后自动恢复</div>
+            <div class="row-sub">与「结束当前任务」互斥</div>
+          </div>
+          <span class="p-switch ${STATE.dockAutoResume ? 'on' : ''}"></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="p-btn p-btn-secondary" style="flex:1" data-act="closeModal">取消</button>
+        <button class="p-btn p-btn-primary" style="flex:1" data-act="setHome" data-val="idle">确认回桩</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSwitchSheet() {
+  return `
+  <div class="overlay-scrim bottom" data-act="closeModal">
+    <div class="sheet-card">
+      <div class="sheet-grab"></div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:12px">切换设备</div>
+      <div class="list-card" style="margin-bottom:12px">
+        <div class="list-row" data-act="closeModal">
+          <img src="${IMG}add/device_product_large.png" style="width:52px;height:40px;object-fit:contain" alt="">
+          <div class="row-body">
+            <div class="row-title">后院割草机 <span class="s-pill ok" style="margin-left:4px">当前</span></div>
+            <div class="row-sub">X5 · 在线充电中 86% · S3 LoRa 已配对</div>
+          </div>
+          ${ic('check', 'sm')}
+        </div>
+        <div class="list-row" data-act="closeModal">
+          <img src="${IMG}add/device_product_large.png" style="width:52px;height:40px;object-fit:contain;opacity:.55" alt="">
+          <div class="row-body">
+            <div class="row-title">前院割草机 <span class="s-pill muted" style="margin-left:4px">共享</span></div>
+            <div class="row-sub">X5 · 离线 · 最后在线 昨天 18:20</div>
+          </div>
+        </div>
+      </div>
+      <button class="p-btn p-btn-secondary" style="width:100%" data-act="toast" data-msg="进入添加设备向导（x5 / s3 / LoRa 三选一）">+ 添加设备</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- 屏 4：设备设置 & 自检 126 & 自检历史 ---------- */
+function renderSettings() {
+  return `
+  <div class="phone-screen">
+    <div class="settings-screen">
+      ${statusbar()}
+      <div class="sub-nav">
+        <button class="icon-hit" data-act="toast" data-msg="返回首页">${ic('back')}</button>
+        <div class="nav-title">设备设置</div>
+        <span style="width:40px"></span>
+      </div>
+      <div class="screen-scroll">
+        <!-- X5 硬件铭牌英雄卡 -->
+        <div class="x5-hero-card">
+          <div class="x5-hero-main">
+            <div class="x5-hero-img-wrap">
+              <img src="${IMG}add/device_product_large.png" alt="X5 割草机">
+            </div>
+            <div class="x5-hero-meta">
+              <div class="x5-hero-name" style="margin-top:0">后院割草机</div>
+              <div class="x5-hero-sn num">SN TMW2026A0018</div>
+              <div class="x5-hero-status"><span class="status-dot ok"></span><span>在线 · 固件 V1.4.2</span></div>
+            </div>
+          </div>
+          <div class="pulse-line"></div>
+        </div>
+
+        <div class="sec-heading">割草与地图</div>
+        <div class="list-card">
+          <button class="list-row" data-act="toast" data-msg="割草偏好：刀盘 50 mm / 5 项传感器">
+            <span class="row-ico">${ic('blade', 'sm')}</span>
+            <span class="row-body"><div class="row-title">割草偏好</div><div class="row-sub">刀盘高度、方向 0°、安全传感器</div></span>
+            <span class="row-val num">50 mm</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="进入地图管理（114 加载 / 重命名 / 删除补偿）">
+            <span class="row-ico">${ic('map', 'sm')}</span>
+            <span class="row-body"><div class="row-title">地图管理</div><div class="row-sub">当前地图：我的庭院（3 区域）</div></span>
+            <span class="row-val">2 张</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+        </div>
+
+        <div class="sec-heading">通信与定位</div>
+        <div class="list-card">
+          <button class="list-row" data-act="toast" data-msg="S3 通信模块：已配对 X5-8A21，支持更换 Wi-Fi 与重新配对">
+            <span class="row-ico">${ic('lora', 'sm')}</span>
+            <span class="row-body"><div class="row-title">通信模块 S3 LoRa</div><div class="row-sub">已配对 X5 · 尾号 8A21</div></span>
+            <span class="s-pill ok">已配对</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="网络 RTK · Wi-Fi Home-5G · 4G 备用未开启">
+            <span class="row-ico">${ic('locate', 'sm')}</span>
+            <span class="row-body"><div class="row-title">定位与网络</div><div class="row-sub">网络 RTK · Wi-Fi / 4G 备用</div></span>
+            <span class="row-val">Wi-Fi</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+        </div>
+
+        <div class="sec-heading">诊断与设备</div>
+        <div class="list-card">
+          <button class="list-row" data-act="setP4" data-val="selfcheck">
+            <span class="row-ico">${ic('pulse', 'sm')}</span>
+            <span class="row-body"><div class="row-title">设备自检</div><div class="row-sub">点击进入 4 大类 25 项设备状态检查</div></span>
+            <span class="s-pill ok">25/25 正常</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="OTA 升级：支持下载/安装双阶段、重启、回滚与前置门禁">
+            <span class="row-ico">${ic('upgrade', 'sm')}</span>
+            <span class="row-body"><div class="row-title">固件升级</div><div class="row-sub">主机 V1.5.0 可用（50% 电量门禁）</div></span>
+            <span class="s-pill bad">有新版本</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="MAC DC:2E:97:36:76:ED · 硬件 v2.1 · 模组应用/MCU底盘分版本">
+            <span class="row-ico">${ic('info', 'sm')}</span>
+            <span class="row-body"><div class="row-title">设备信息</div><div class="row-sub">MAC · 硬件版本 · 模组/MCU 分固件</div></span>
+            <span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+        </div>
+
+        <div class="sec-heading">计划与共享</div>
+        <div class="list-card">
+          <button class="list-row" data-act="toast" data-msg="定时任务：循环 + 单次预约 + 冲突校验">
+            <span class="row-ico">${ic('cal', 'sm')}</span>
+            <span class="row-body"><div class="row-title">定时任务</div></span>
+            <span class="row-val num">周三 09:30</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="割草记录：可查看历史割草状态、时长与轨迹">
+            <span class="row-ico">${ic('records', 'sm')}</span>
+            <span class="row-body"><div class="row-title">割草记录</div></span>
+            <span class="row-val">本月 4 次</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+          <button class="list-row" data-act="toast" data-msg="共享成员：2 人">
+            <span class="row-ico">${ic('users', 'sm')}</span>
+            <span class="row-body"><div class="row-title">共享成员</div></span>
+            <span class="row-val">2 人</span><span class="row-chev">${ic('right', 'sm')}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const CHECK_126_CATS = [
+  { id: 'chassis', title: '底盘硬件自检', items: ['CAN 总线通信','行走驱动','刀盘驱动','转向/伺服','电池与充电回路','刀盘升降结构'], badIdx: [2] },
+  { id: 'sensors', title: '传感器自检',   items: ['相机','IMU','激光雷达','RTK/GNSS','超声波避障','安全开关组'], badIdx: [3] },
+  { id: 'system',  title: '系统运行状态', items: ['SoC','内存','存储','系统时间同步','网络与云通道','电源与启动健康'], badIdx: [] },
+  { id: 'nodes',   title: '节点运行状态', items: ['iot','蓝牙配网','xbot 业务','导航规控','定位','感知','驱动'], badIdx: [] },
+];
+
+function renderSelfCheck(hasErr) {
+  return `
+  <div class="phone-screen">
+    <div class="settings-screen">
+      ${statusbar()}
+      <div class="sub-nav">
+        <button class="icon-hit" data-act="setP4" data-val="settings">${ic('back')}</button>
+        <div class="nav-title">设备自检</div>
+        <button class="nav-link" data-act="setP4" data-val="history">历史</button>
+      </div>
+      <div class="screen-scroll" style="padding-bottom:84px">
+        <div class="diag-deck">
+          <div class="diag-head">
+            <span class="spec-badge light"><i class="tri"></i><span>126 DIAG</span><span class="sep"></span><span class="num">25 ITEMS</span></span>
+            <span class="s-pill ${hasErr ? 'bad' : 'ok'}">${hasErr ? '2 项异常' : '全部正常'}</span>
+          </div>
+          <div class="diag-stage">
+            <img src="${IMG}device/device_selfcheck_product.png" alt="X5 自检俯视图">
+            ${hasErr ? `
+              <span class="diag-node bad" style="left:50%;top:22%"></span>
+              <span class="diag-callout bad" style="left:134px;top:16px">RTK/GNSS 异常</span>
+              <span class="diag-node bad" style="left:21%;top:50%"></span>
+              <span class="diag-callout bad" style="left:-14px;top:128px">刀盘驱动异常</span>
+            ` : `
+              <span class="diag-node ok" style="left:50%;top:22%"></span>
+              <span class="diag-node ok" style="left:50%;top:52%"></span>
+              <span class="diag-node ok" style="left:50%;top:80%"></span>
+            `}
+          </div>
+          <div class="pulse-line"></div>
+        </div>
+
+        <div class="diag-summary-bar">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:${hasErr ? 'var(--state-danger)' : 'var(--text-primary)'}">
+              ${hasErr ? '自检完成 · 发现 2 项异常' : '全部项目通过 · 25 项检测正常'}
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">
+              ${hasErr ? '请排查刀盘绕草与 RTK 天线遮挡后重新自检' : '最近同步 刚刚 · 本地历史已落盘'}
+            </div>
+          </div>
+          <span class="num" style="font-size:20px;font-weight:700;color:${hasErr ? 'var(--state-danger)' : 'var(--state-ok)'}">${hasErr ? '23/25' : '25/25'}</span>
+        </div>
+
+        ${CHECK_126_CATS.map(cat => {
+          const badSet = hasErr ? cat.badIdx : [];
+          const expanded = !!STATE.expandedCats[cat.id];
+          return `
+          <div class="cat-card">
+            <button class="cat-head" data-act="toggleCat" data-val="${cat.id}">
+              <div>
+                <div style="font-size:14px;font-weight:600">${cat.title}</div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${cat.items.length - badSet.length} 项正常${badSet.length ? ` · <b style="color:var(--state-danger)">${badSet.length} 项异常</b>` : ''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="s-pill ${badSet.length ? 'bad' : 'ok'}">${badSet.length ? '异常' : '正常'}</span>
+                <span style="color:var(--text-muted)">${ic(expanded ? 'down' : 'right', 'sm')}</span>
+              </div>
+            </button>
+            ${expanded ? `
+            <div class="cat-items">
+              ${cat.items.map((name, idx) => {
+                const isBad = badSet.includes(idx);
+                return `<div class="cat-item ${isBad ? 'bad' : ''}"><span class="status-dot ${isBad ? 'bad' : 'ok'}"></span><span>${name}</span></div>`;
+              }).join('')}
+            </div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 26px;background:var(--bg-canvas);border-top:1px solid var(--border-subtle);display:flex;gap:10px">
+        <button class="p-btn p-btn-secondary" style="flex:1" data-act="setP4" data-val="${hasErr ? 'selfcheck' : 'selfcheckErr'}">${hasErr ? '切回正常态' : '模拟 2 项异常'}</button>
+        <button class="p-btn p-btn-primary" style="flex:1" data-act="toast" data-msg="已下发 126 自检指令（无固定超时，断线切结果待确认）">重新自检</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSelfCheckHistory() {
+  const logs = [
+    { t: '今天 10:18', res: '全部项目通过 · 25 项检测正常', st: 'ok', tag: '正常' },
+    { t: '昨天 17:42', res: '自检完成 · 2 项异常（刀盘驱动、RTK/GNSS）', st: 'bad', tag: '异常' },
+    { t: '11 月 19 日 09:05', res: '断开连接 · 结果待确认', st: 'warn', tag: '待确认' },
+  ];
+  return `
+  <div class="phone-screen">
+    <div class="settings-screen">
+      ${statusbar()}
+      <div class="sub-nav">
+        <button class="icon-hit" data-act="setP4" data-val="selfcheck">${ic('back')}</button>
+        <div class="nav-title">自检历史</div>
+        <button class="nav-link" style="color:var(--state-danger)" data-act="toast" data-msg="已触发清空本地自检历史缓存确认">清空</button>
+      </div>
+      <div class="screen-scroll">
+        <div style="font-size:12px;color:var(--text-secondary);margin:4px 4px 10px">
+          仅展示本地落盘的已上报自检记录；可在「我的 → 清空本地缓存」一并清理。
+        </div>
+        <div class="list-card">
+          ${logs.map(l => `
+          <div class="list-row" style="cursor:default">
+            <span class="row-ico">${ic('history', 'sm')}</span>
+            <div class="row-body">
+              <div class="row-title num">${l.t}</div>
+              <div class="row-sub">${l.res}</div>
+            </div>
+            <span class="s-pill ${l.st}">${l.tag}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAll() {
+  document.body.className = STATE.theme;
+  const stage = document.getElementById('stage');
+  stage.className = STATE.layout === 'single' ? 'stage-grid single' : 'stage-grid';
+
+  const screens = [
+    { id: 'splash',   name: '屏 1 · 启动页',     desc: '产品实机主视图与品牌标识', html: renderSplash() },
+    { id: 'login',    name: '屏 2 · 登录认证',   desc: '密码 / 验证码双方式登录 · 隐私协议摘要', html: renderLogin() },
+    { id: 'home',     name: '屏 3 · 设备首页',   desc: '草坪地图与割草路线展示 · 一键作业与状态面板', html: renderHome() },
+    { id: 'settings', name: STATE.p4Mode === 'settings' ? '屏 4 · 设备设置' : STATE.p4Mode === 'history' ? '屏 4 · 自检历史' : '屏 4 · 设备自检',
+      desc: '设备概要信息 · S3 通信配件 · 4 大类 25 项自检',
+      html: STATE.p4Mode === 'settings' ? renderSettings() : STATE.p4Mode === 'history' ? renderSelfCheckHistory() : renderSelfCheck(STATE.p4Mode === 'selfcheckErr') },
+  ];
+
+  const visible = STATE.layout === 'single' ? [screens.find(s => s.id === STATE.focusScreen) || screens[2]] : screens;
+  stage.innerHTML = visible.map(s => `
+    <section class="phone-col">
+      <div class="phone-col-head">
+        <span class="name">${s.name}</span>
+        <span class="desc">${s.desc}</span>
+      </div>
+      <div class="device-chassis">${s.html}</div>
+    </section>
+  `).join('');
+
+  // 同步控制条状态
+  document.querySelectorAll('#themeSwitch button').forEach(b => b.classList.toggle('on', b.dataset.theme === STATE.theme));
+  document.querySelectorAll('#layoutSwitch button').forEach(b => b.classList.toggle('on', b.dataset.layout === STATE.layout));
+  document.querySelectorAll('#homeSwitch button').forEach(b => b.classList.toggle('on', b.dataset.home === STATE.homeState));
+  document.querySelectorAll('#p4Switch button').forEach(b => b.classList.toggle('on', b.dataset.p4 === STATE.p4Mode));
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  document.querySelector('.proto-toast')?.remove();
+  clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className = 'proto-toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastTimer = setTimeout(() => el.remove(), 2200);
+}
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-theme],[data-layout],[data-home],[data-p4],[data-act]');
+  if (!btn) return;
+  if (btn.dataset.theme) { STATE.theme = btn.dataset.theme; return renderAll(); }
+  if (btn.dataset.layout) { STATE.layout = btn.dataset.layout; return renderAll(); }
+  if (btn.dataset.home) { STATE.homeState = btn.dataset.home; STATE.dropmowMode = false; STATE.homeModal = null; return renderAll(); }
+  if (btn.dataset.p4) { STATE.p4Mode = btn.dataset.p4; return renderAll(); }
+
+  const act = btn.dataset.act, val = btn.dataset.val;
+  if (act === 'authTab') { STATE.authTab = val; renderAll(); }
+  else if (act === 'togglePwd') { STATE.pwdVisible = !STATE.pwdVisible; renderAll(); }
+  else if (act === 'toggleAgree') {
+    if (e.target.closest('[data-act="openPrivacy"]')) return;
+    STATE.agreed = !STATE.agreed; renderAll();
+  }
+  else if (act === 'openPrivacy') { STATE.homeModal = 'privacy'; renderAll(); }
+  else if (act === 'startDropmow') { STATE.homeState = 'mowing'; STATE.dropmowMode = true; STATE.homeModal = null; renderAll(); showToast('Dropmow 一键启动已触发'); }
+  else if (act === 'setHome') { STATE.homeState = val; STATE.dropmowMode = false; STATE.homeModal = null; renderAll(); }
+  else if (act === 'openModal') { STATE.homeModal = val; renderAll(); }
+  else if (act === 'closeModal') { if (btn.classList.contains('overlay-scrim') && e.target !== btn) return; STATE.homeModal = null; renderAll(); }
+  else if (act === 'toggleDockClear') {
+    STATE.dockClearTask = !STATE.dockClearTask;
+    if (STATE.dockClearTask) STATE.dockAutoResume = false;
+    renderAll();
+  }
+  else if (act === 'toggleDockAuto') {
+    if (!STATE.dockClearTask) { STATE.dockAutoResume = !STATE.dockAutoResume; renderAll(); }
+  }
+  else if (act === 'setP4') { STATE.p4Mode = val; renderAll(); }
+  else if (act === 'goSettings') { STATE.p4Mode = 'settings'; STATE.focusScreen = 'settings'; renderAll(); showToast('已在第 4 屏展示设备设置'); }
+  else if (act === 'toggleCat') { STATE.expandedCats[val] = !STATE.expandedCats[val]; renderAll(); }
+  else if (act === 'toast') { showToast(btn.dataset.msg || '操作已触发'); }
+});
+
+renderAll();
+</script>
+</body>
+</html>

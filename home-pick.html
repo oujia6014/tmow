@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T-MOW 1.4 首页重做选型（独立对比页）</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="theme-1.4.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #DDE3EC;
+    color: #14171C;
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    padding: 22px 24px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; border: none; background: none; color: inherit; cursor: pointer; }
+
+  /* ---------- 顶部评审控制条 ---------- */
+  .review-bar {
+    max-width: 1420px;
+    margin: 0 auto 20px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+    border-radius: 16px;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(17, 19, 23, 0.05);
+  }
+  .review-title h1 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #EEF2F7;
+    color: #14171C;
+    border: 1px solid #CFD7E2;
+    border-bottom: 2px solid #F08300;
+  }
+  .review-title p {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #5B6470;
+  }
+  .review-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #F3F5F8;
+    border: 1px solid #DCE2E8;
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .ctrl-group .lbl {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5B6470;
+    padding: 0 6px;
+  }
+  .ctrl-group button {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 7px;
+    color: #5B6470;
+    transition: all 0.14s;
+  }
+  .ctrl-group button:hover { color: #14171C; }
+  .ctrl-group button.on { background: #1E232B; color: #FFFFFF; }
+  .back-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: #14171C;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 9px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+  }
+  .back-link:hover { background: #F3F5F8; }
+
+  /* ---------- 三方案并排网格 ---------- */
+  .variants-grid {
+    max-width: 1420px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 414px);
+    justify-content: center;
+    gap: 28px;
+  }
+  @media (max-width: 1360px) {
+    .variants-grid { grid-template-columns: repeat(2, 414px); }
+  }
+  @media (max-width: 900px) {
+    .variants-grid { grid-template-columns: 414px; }
+  }
+  .variant-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .variant-meta {
+    width: 100%;
+    padding: 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .variant-meta .name { font-size: 13.5px; font-weight: 700; color: #14171C; }
+  .variant-meta .sub { font-size: 11.5px; color: #5B6470; }
+  .device-chassis {
+    background: #14161A;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow: 0 26px 56px -18px rgba(17, 19, 23, 0.34), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  /* =========================================================
+     公共手机画幅 & 原版全宽地图底板
+     ========================================================= */
+  .hp-screen {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    background: #F2F5F2;
+    color: #14171C;
+    font-family: var(--font-ui);
+    user-select: none;
+  }
+  .hp-map {
+    position: absolute;
+    inset: 0;
+  }
+  .hp-map svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hp-top-scrim {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 118px;
+    background: linear-gradient(180deg, rgba(242, 245, 242, 0.96) 0%, rgba(242, 245, 242, 0.72) 56%, rgba(242, 245, 242, 0) 100%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .hp-topbar {
+    position: absolute;
+    top: 46px;
+    left: 16px;
+    right: 16px;
+    height: 42px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  /* 通用状态点与小徽章 */
+  .hp-sig-chip {
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #F2F5F8;
+    border: 1px solid #E1E6EE;
+    color: #2B333E;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .hp-mow-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #E4EDE6;
+    overflow: hidden;
+  }
+  .hp-mow-bar i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #168A3A 0%, #2AB862 100%);
+  }
+
+  /* 公共浅色 Tab 栏（用于选型 1 & 选型 3） */
+  .hp-tabs {
+    height: 62px;
+    background: #FFFFFF;
+    border-top: 1px solid #EBEEF2;
+    display: flex;
+    padding: 4px 28px 10px;
+    position: relative;
+    z-index: 9;
+  }
+  .hp-tabs.abs {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+  }
+  .hp-tabs button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6B7480;
+    position: relative;
+  }
+  .hp-tabs button.on { color: #14171C; font-weight: 700; }
+  .hp-tabs button.on::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: #F08300;
+  }
+
+  /* =========================================================
+     选型 1：通透大地图 + 上浮微胶囊工具带 + 单层纯白控台
+     ========================================================= */
+  .v1-devpill {
+    height: 38px;
+    padding: 0 11px 0 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(216, 224, 232, 0.9);
+    box-shadow: 0 4px 12px rgba(17, 19, 23, 0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .v1-devpill .ava {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #F2F5F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .v1-devpill .ava img { width: 24px; height: auto; }
+  .v1-devpill .name { font-size: 13px; font-weight: 700; color: #14171C; display: inline-flex; align-items: center; gap: 4px; }
+
+  /* 一体式分段胶囊：替代竞品右上双孤圆 */
+  .v1-seg {
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(216, 224, 232, 0.9);
+    box-shadow: 0 4px 12px rgba(17, 19, 23, 0.06);
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .v1-seg button {
+    width: 38px;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E232B;
+    position: relative;
+  }
+  .v1-seg .vsep { width: 1px; height: 15px; background: #E1E6EE; }
+  .v1-seg .dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--state-danger); border: 1.5px solid #FFFFFF;
+  }
+
+  /* 控台正上方居中的轻量横向胶囊工具带（无右侧立柱） */
+  .v1-map-tools {
+    position: absolute;
+    left: 50%;
+    bottom: 282px;
+    transform: translateX(-50%);
+    z-index: 7;
+    height: 36px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(220, 226, 234, 0.95);
+    box-shadow: 0 6px 18px rgba(17, 19, 23, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .v1-map-tools button {
+    height: 28px;
+    padding: 0 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E232B;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .v1-map-tools button:hover { background: #F1F4F8; }
+  .v1-map-tools .sep { width: 1px; height: 14px; background: #E2E7EE; }
+
+  .v1-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 62px;
+    z-index: 8;
+    background: #FFFFFF;
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -8px 28px rgba(17, 19, 23, 0.08);
+    padding: 18px 20px 16px;
+  }
+  .v1-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .v1-st-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .v1-st-sub { margin-top: 3px; font-size: 12px; color: #5B6470; }
+  .v1-tele { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+  .v1-bat { display: inline-flex; align-items: baseline; gap: 2px; line-height: 1; }
+  .v1-bat b { font-size: 26px; font-weight: 700; color: #14171C; }
+  .v1-bat span { font-size: 12px; font-weight: 600; color: #5B6470; }
+
+  .v1-pref-strip {
+    margin-top: 13px;
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 11px;
+    background: #F4F6F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #2B333E;
+  }
+  .v1-actions {
+    margin-top: 13px;
+    display: flex;
+    gap: 10px;
+  }
+  .v1-btn-main {
+    flex: 1;
+    height: 48px;
+    border-radius: 14px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+  }
+  .v1-btn-main::after {
+    content: "";
+    position: absolute;
+    left: 20px; right: 20px; bottom: 0; height: 2px;
+    background: #F08300;
+  }
+  .v1-btn-main.danger { background: #C22736; }
+  .v1-btn-main.danger::after { display: none; }
+  .v1-btn-sq {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #F2F5F8;
+    border: 1px solid #DCE2EA;
+    color: #14171C;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  /* =========================================================
+     选型 2：无框空气感地图 + 底部悬浮纯白操作岛
+     ========================================================= */
+  .v2-plain-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    text-align: left;
+  }
+  .v2-plain-top .ava {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #DCE2EA;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .v2-plain-top .ava img { width: 30px; height: auto; }
+  .v2-plain-top .t1 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 4px; line-height: 1.15; }
+  .v2-plain-top .t2 { margin-top: 2px; font-size: 11px; font-weight: 600; color: #4D5763; display: flex; align-items: center; gap: 5px; }
+  .v2-icon-pair { display: flex; gap: 4px; }
+  .v2-icon-pair button {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #1E232B; position: relative;
+  }
+  .v2-icon-pair .dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--state-danger); border: 1.5px solid #F2F5F2;
+  }
+
+  /* 左上紧贴地图的无框状态摘要（极简空气感） */
+  .v2-air-summary {
+    position: absolute;
+    top: 100px;
+    left: 18px;
+    right: 18px;
+    z-index: 6;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .v2-air-summary .left .h { font-size: 24px; font-weight: 700; letter-spacing: -0.025em; color: #14171C; display: flex; align-items: center; gap: 8px; }
+  .v2-air-summary .left .p { margin-top: 2px; font-size: 12px; color: #4D5763; font-weight: 500; }
+  .v2-air-summary .right { pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .v2-air-summary .right .bat { font-size: 24px; font-weight: 700; color: #14171C; line-height: 1; }
+  .v2-air-summary .right .bat small { font-size: 11px; color: #5B6470; font-weight: 600; }
+
+  .v2-bottom-fade {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 220px;
+    background: linear-gradient(180deg, rgba(242, 245, 242, 0) 0%, rgba(236, 240, 244, 0.85) 55%, rgba(236, 240, 244, 0.98) 100%);
+    pointer-events: none; z-index: 4;
+  }
+  .v2-float-island {
+    position: absolute;
+    left: 14px; right: 14px; bottom: 80px;
+    z-index: 9;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 30px rgba(17, 19, 23, 0.11);
+    overflow: hidden;
+  }
+  .v2-quick-rail {
+    height: 40px;
+    background: #F4F6FA;
+    border-bottom: 1px solid #E7ECF2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .v2-quick-rail button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    font-size: 11px; font-weight: 600; color: #2B333E; position: relative;
+  }
+  .v2-quick-rail button + button::before {
+    content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 1px; background: #E1E7EF;
+  }
+  .v2-island-body {
+    padding: 13px 15px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .v2-island-cta {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 13px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+    position: relative; overflow: hidden; flex: none;
+  }
+  .v2-island-cta::before {
+    content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+    background: #F08300; border-radius: 0 3px 3px 0;
+  }
+  .v2-float-tabs {
+    position: absolute;
+    left: 96px; right: 96px; bottom: 16px; height: 50px;
+    z-index: 9;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #FFFFFF;
+    box-shadow: 0 8px 22px rgba(17, 19, 23, 0.11);
+    display: flex;
+    padding: 4px 10px;
+  }
+  .v2-float-tabs button {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    font-size: 10.5px; font-weight: 600; color: #6B7480; position: relative;
+  }
+  .v2-float-tabs button.on { color: #14171C; font-weight: 700; }
+  .v2-float-tabs button.on::after {
+    content: ""; position: absolute; bottom: 2px; width: 16px; height: 2px; border-radius: 2px; background: #F08300;
+  }
+
+  /* =========================================================
+     选型 3：轻量化「类竞品」高定秩序版（好骨架 + T-MOW 差异）
+     ========================================================= */
+  .v3-brandpill {
+    height: 36px;
+    padding: 0 11px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #DCE2EA;
+    box-shadow: 0 4px 12px rgba(17, 19, 23, 0.06);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .v3-brandpill img.logo { height: 11px; width: auto; }
+  .v3-brandpill .sep { width: 1px; height: 12px; background: #CFD7E2; }
+  .v3-brandpill .name { font-size: 12.5px; font-weight: 700; color: #14171C; display: inline-flex; align-items: center; gap: 4px; }
+  .v3-fab-pair { display: flex; gap: 7px; }
+  .v3-sq-fab {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #DCE2EA;
+    box-shadow: 0 4px 12px rgba(17, 19, 23, 0.06);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #14171C; position: relative;
+  }
+  .v3-sq-fab .dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--state-danger); border: 1.5px solid #FFFFFF;
+  }
+
+  .v3-low-tools {
+    position: absolute;
+    right: 16px;
+    bottom: 292px;
+    z-index: 7;
+    display: flex;
+    gap: 8px;
+  }
+  .v3-low-tools .btn-chip {
+    height: 36px;
+    padding: 0 11px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #DCE2EA;
+    box-shadow: 0 6px 16px rgba(17, 19, 23, 0.09);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E232B;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* 地图底部左侧悬浮胶囊 + 右侧竖排轻浮钮 */
+  .hp-bot-left-pill {
+    position: absolute;
+    left: 16px;
+    z-index: 7;
+    height: 38px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #DCE2EA;
+    box-shadow: 0 6px 18px rgba(17, 19, 23, 0.09);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .hp-bot-left-pill button {
+    height: 30px;
+    padding: 0 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E232B;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .hp-bot-left-pill button:hover { background: #F1F4F8; }
+  .hp-bot-left-pill .sep { width: 1px; height: 14px; background: #E2E7EE; }
+
+  .hp-right-rail {
+    position: absolute;
+    right: 16px;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .hp-rail-btn {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #DCE2EA;
+    box-shadow: 0 6px 16px rgba(17, 19, 23, 0.09);
+    color: #1E232B;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .hp-rail-btn.icon-only { width: 38px; padding: 0; }
+  .hp-rail-btn.col {
+    width: 56px;
+    height: 50px;
+    padding: 4px 2px;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 9.5px;
+    font-weight: 700;
+    position: relative;
+  }
+  .hp-rail-btn.dropmow-hero { border-color: rgba(240, 131, 0, .42); }
+  .hp-rail-btn.dropmow-hero .dm-dot { position: absolute; top: 4px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: #F08300; }
+    flex-direction: column;
+    gap: 1px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .v3-panel {
+    position: absolute;
+    left: 0; right: 0; bottom: 62px;
+    z-index: 8;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 28px rgba(17, 19, 23, 0.08);
+    overflow: hidden;
+  }
+  .v3-tele-bar {
+    background: #F6F8FA;
+    border-bottom: 1px solid #E9EEF3;
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .v3-body { padding: 14px 18px 16px; }
+  /* 左右两栏数据对位：借鉴竞品的双栏高效扫描，但改左对齐精密风 */
+  .v3-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 13px;
+  }
+  .v3-stat-box {
+    padding: 9px 11px;
+    border-radius: 14px;
+    background: linear-gradient(150deg, #F8FAFC 0%, #F1F4F8 100%);
+    border: 1px solid #E3E8F0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .v3-stat-box.tone-green,
+  .v3-stat-box.tone-amber { background: linear-gradient(150deg, #F8FAFC 0%, #F1F4F8 100%); border-color: #E3E8F0; }
+  .v3-stat-box .stat-wm { position: absolute; right: 8px; top: 20px; width: 40px; height: 40px; pointer-events: none; color: #7D8896; opacity: 0.11; }
+  .v3-stat-box .stat-top { display: flex; align-items: center; gap: 6px; position: relative; z-index: 1; }
+  .v3-stat-box .stat-ico { width: 24px; height: 24px; border-radius: 8px; background: #E6EBF2; color: #3E4754; border: 1px solid rgba(255,255,255,.7); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .v3-stat-box .stat-ico svg { width: 13px; height: 13px; }
+  .v3-stat-box.tone-green .stat-ico { background: #DCF0DF; color: #16794B; }
+  .v3-stat-box.tone-amber .stat-ico { background: #FDE9CB; color: #C96A00; }
+  .v3-stat-box .k { font-size: 11px; font-weight: 600; color: #5B6470; }
+  .v3-stat-box .stat-pill.ok { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 5px; background: #D7EFE0; color: #146E42; }
+  .v3-stat-box .stat-arr { margin-left: auto; font-size: 13px; color: #8C96A4; line-height: 1; }
+  .v3-stat-box .v { margin-top: 6px; font-size: 14px; font-weight: 700; color: #14171C; position: relative; z-index: 1; }
+  .v3-stat-box .stat-foot { margin-top: 7px; height: 15px; display: flex; align-items: center; gap: 5px; position: relative; z-index: 1; }
+  .stat-mini-bar { flex: 1; height: 4px; border-radius: 999px; background: rgba(22,138,58,.15); overflow: hidden; }
+  .stat-mini-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #168A3A 0%, #2CB560 100%); }
+  .stat-foot-txt { font-size: 10px; font-weight: 600; color: #4D6B53; white-space: nowrap; }
+  .stat-days { display: flex; align-items: center; gap: 3px; width: 100%; }
+  .stat-days i { flex: 1; height: 15px; border-radius: 4px; font-style: normal; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; background: #E5EAF0; color: #7D8794; }
+  .stat-days i.on { background: #F08300; color: #FFFFFF; }
+
+  .v3-cta-main {
+    width: 100%;
+    height: 48px;
+    border-radius: 13px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+  }
+  .v3-cta-main::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 10px; bottom: 10px; width: 3.5px;
+    background: #F08300;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .proto-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1E232B; color: #FFFFFF; padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 500; box-shadow: 0 12px 30px rgba(17, 19, 23, 0.25);
+    border-bottom: 2px solid #F08300; z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<header class="review-bar">
+  <div class="review-title">
+    <h1>T-MOW 1.4 首页组合定稿选型 <span class="tag-pill">3 顶栏 + 地图底浮 + 右侧浮钮 + 白色实线</span></h1>
+    <p>三款均采用选型 3 顶栏与原版浅绿草坪/白色 zigzag 走线，对比「底部悬浮按钮 + 右侧按钮」的不同落位与三种底部控台形态。</p>
+  </div>
+  <div class="review-controls">
+    <div class="ctrl-group" id="stCtrl">
+      <span class="lbl">场景态</span>
+      <button class="on" data-st="idle">待机充电</button>
+      <button data-st="mowing">割草中(103)</button>
+      <button data-st="mapping">建图沿边(未闭合路径)</button>
+      <button data-st="blocked">bit7 阻挡</button>
+    </div>
+    <div class="ctrl-group" id="traceCtrl">
+      <span class="lbl">割草路径色</span>
+      <button class="on" data-tr="white">白色实线(原生推荐)</button>
+      <button data-tr="green">深绿线(1.3 原版)</button>
+    </div>
+    <a class="back-link" href="index.html">← 返回完整原型</a>
+  </div>
+</header>
+
+<main class="variants-grid" id="grid"></main>
+
+<script>
+const IMG = 'assets/';
+const ICO = {
+  down: '<path d="m6 9 6 6 6-6"/>',
+  right: '<path d="m9 6 6 6-6 6"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  play: '<path d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7z" fill="currentColor" stroke="none"/>',
+  pause: '<rect x="6.5" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/>',
+  home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5.5h-6V20H5a1 1 0 0 1-1-1z"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/>',
+  msg: '<path d="M5 5h14a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h7"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  map: '<path d="M3 6.5 8.5 4l7 2.5L21 4v13.5L15.5 20l-7-2.5L3 20z"/><path d="M8.5 4v13.5M15.5 6.5V20"/>',
+  pad: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="13.8" r=".7" fill="currentColor"/>',
+  dock: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  locate: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
+  alert: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+  wifi: '<path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0"/><circle cx="12" cy="19.2" r="1" fill="currentColor" stroke="none"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+  records: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  blade: '<circle cx="12" cy="12" r="2"/><path d="M12 10c0-3 1.5-5.5 4-6.5M14 12c3 0 5.5 1.5 6.5 4M12 14c0 3-1.5 5.5-4 6.5M10 12c-3 0-5.5-1.5-6.5-4"/>',
+  dropmow: '<g><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(120 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(240 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g>',
+};
+const ic = (n, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24">${ICO[n]}</svg>`;
+function sigBars(n = 4) {
+  return `<svg class="ico sm" style="width:13px;height:13px" viewBox="0 0 24 24">${[0,1,2,3].map(i =>
+    `<rect x="${3 + i*5}" y="${16 - i*3.5}" width="3" height="${4 + i*3.5}" rx="1" fill="${i < n ? 'currentColor' : 'none'}" stroke="${i < n ? 'none' : 'currentColor'}" stroke-width="1.3" opacity="${i < n ? 1 : .35}"/>`).join('')}</svg>`;
+}
+function statusbar() {
+  return `<div class="sb"><span>9:41</span><span class="sb-icons">${sigBars(4)}${ic('wifi', 'sm')}<svg class="ico sm" viewBox="0 0 24 24" style="width:22px"><rect x="2" y="7" width="18" height="10" rx="2.5"/><path d="M22 10.5v3"/><rect x="4" y="9" width="13" height="6" rx="1" fill="currentColor" stroke="none"/></svg></span></div>`;
+}
+
+const APP = {
+  st: 'idle',      // idle | mowing | mapping | blocked
+  trace: 'white',  // white (Flutter 原生) | green (1.3 原型)
+  modal: null,     // null | { target:'1'|'2'|'3', kind:'signal'|'dock' }
+  dockClear: true,
+  dockAuto: false,
+};
+
+/* ---------- 原版地图绘制（严格沿用 1.3 + TMapPainter 规则：浅绿草地 + 草地斑点 + 未闭合3px实线 / zigzag走线，无棕色感叹号） ---------- */
+function renderOriginalLawnMap(uid, extraTopOffset = 0) {
+  const Z1 = 'M26 168 C 92 142, 248 130, 362 142 C 378 182, 382 242, 374 282 C 296 292, 120 292, 28 290 C 16 254, 16 206, 26 168Z';
+  const Z2 = 'M28 408 C 120 406, 228 406, 296 408 C 336 408, 366 412, 378 420 C 386 468, 384 516, 372 560 C 276 574, 120 576, 36 564 C 20 516, 18 456, 28 408Z';
+  const Z3 = 'M308 302 C 336 298, 360 298, 376 304 C 382 338, 382 368, 376 398 C 354 402, 330 402, 308 398 C 302 368, 302 328, 308 302Z';
+  const Z1_OPEN = 'M26 168 C 92 142, 248 130, 362 142 C 378 182, 382 242, 374 282';
+
+  const mowing = APP.st === 'mowing' || APP.st === 'blocked';
+  const mapping = APP.st === 'mapping';
+  const traceColor = APP.trace === 'white' ? '#FFFFFF' : '#2F6B2A';
+  const traceOp = APP.trace === 'white' ? '0.92' : '0.58';
+
+  // 草地斑点纹理（与 TMapVisualTokens / 1.3 同源）
+  let dots = '';
+  const step = 8.2, tile = step * 6;
+  for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) {
+    let h = (c * 73856093 ^ r * 19349663) >>> 0;
+    h = ((h ^ (h >>> 13)) * 1274126177) >>> 0;
+    if (h % 3) continue;
+    const x = (c + .5) * step + ((h % 7) - 3) * step * .12;
+    const y = (r + .5) * step + (((h / 7 | 0) % 5) - 2) * step * .12;
+    const rr = 1.6 * (.65 + (h % 4) * .12);
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr.toFixed(2)}" fill="${h % 2 ? '#9DBF95' : '#FFFFFF'}" opacity="${h % 2 ? 0.14 : 0.28}"/>`;
+  }
+
+  // 割草走过的往返路径（严格按 Z1 上半 55% 扫描，不越界）
+  const pts = [];
+  for (let i = 0; i <= 9; i++) {
+    const y = 148 + i * 10;
+    const a = `14 ${y}`, b = `388 ${y - 6}`;
+    pts.push(...(i % 2 ? [b, a] : [a, b]));
+  }
+
+  const robotPos = mapping ? [304, 136] : mowing ? [302, 232] : [76, 348];
+  const robotRot = mapping ? 96 : mowing ? 78 : 0;
+  const clipId = `clipZ1_${uid}`, patGrass = `grass_${uid}`, patGrid = `grid_${uid}`;
+  const vb = `-12 ${40 - extraTopOffset} 422 800`;
+
+  const zone = d => `
+    <path d="${d}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <path d="${d}" fill="#DDEDD9"/>
+    <path d="${d}" fill="url(#${patGrass})"/>
+    <path d="${d}" fill="none" stroke="#5E8F55" stroke-width="1.2" stroke-dasharray="2.5 2.5"/>`;
+
+  return `
+  <svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <clipPath id="${clipId}"><path d="${Z1}"/></clipPath>
+      <pattern id="${patGrass}" width="${tile}" height="${tile}" patternUnits="userSpaceOnUse">${dots}</pattern>
+      <pattern id="${patGrid}" width="18" height="18" patternUnits="userSpaceOnUse">
+        <circle cx="9" cy="9" r="0.95" fill="#B9C3B8" fill-opacity="0.45"/>
+      </pattern>
+    </defs>
+
+    <rect x="-80" y="-80" width="560" height="1000" fill="#F2F5F2"/>
+    <rect x="-80" y="-80" width="560" height="1000" fill="url(#${patGrid})"/>
+
+    ${mapping ? `
+      <!-- 建图态：严格沿用原版未闭合 3px 深绿粗实线 + 虚线预估 + 起点靶心 -->
+      <path d="${Z1_OPEN}" fill="none" stroke="#5E8F55" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="6 6" opacity="0.35"/>
+      <path d="M26 168 C 92 142, 200 132, 304 136" fill="none" stroke="#168A3A" stroke-width="3.4" stroke-linecap="round"/>
+      <g transform="translate(26 168)">
+        <circle r="7" fill="#FFFFFF" stroke="#168A3A" stroke-width="1.8"/>
+        <circle r="2.8" fill="#168A3A"/>
+      </g>
+    ` : `
+      <!-- 通道（连接区域1与区域2） -->
+      <path d="M74 286 L74 412" fill="none" stroke="#D8DBD0" stroke-opacity="0.82" stroke-width="20" stroke-linecap="round"/>
+      <path d="M74 286 L74 412" fill="none" stroke="#A9B09E" stroke-width="2.2" stroke-dasharray="5.5 6.5" stroke-linecap="round"/>
+
+      <!-- 浅绿需要割草的区域草地 -->
+      ${zone(Z1)}
+      ${zone(Z2)}
+      ${zone(Z3)}
+
+      <!-- 割草走过的路径（原版往返实线） -->
+      ${mowing ? `<g clip-path="url(#${clipId})"><polyline points="${pts.join(' ')}" fill="none" stroke="${traceColor}" stroke-opacity="${traceOp}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : ''}
+
+      <!-- 区名与面积 -->
+      <g font-family="var(--font-ui)" text-anchor="middle">
+        <text x="196" y="218" font-size="14" font-weight="700" fill="#325330">区域 1</text>
+        <text x="196" y="234" font-size="10.5" font-weight="600" fill="#4D754A" class="num">118 ㎡</text>
+        <text x="200" y="486" font-size="14" font-weight="700" fill="#325330">区域 2</text>
+        <text x="200" y="502" font-size="10.5" font-weight="600" fill="#4D754A" class="num">52 ㎡</text>
+        <text x="342" y="352" font-size="12" font-weight="700" fill="#325330">侧院</text>
+      </g>
+    `}
+
+    <!-- 充电桩 -->
+    <g transform="translate(124 348)">
+      <rect x="-13" y="-13" width="26" height="26" rx="7" fill="#FFFFFF" stroke="#5E8F55" stroke-opacity="0.35" stroke-width="1.2"/>
+      <image href="${IMG}device/icon_device_charge_station.png" x="-11" y="-11" width="22" height="22"/>
+    </g>
+
+    <!-- 机器人实时位置 -->
+    <g transform="translate(${robotPos[0]} ${robotPos[1]}) rotate(${robotRot})">
+      ${(mowing || mapping) ? `<circle r="27" fill="#FFFFFF" fill-opacity="0.48" stroke="#168A3A" stroke-opacity="0.32" stroke-width="1.2"/>` : ''}
+      <circle r="21" fill="#FFFFFF" fill-opacity="0.88"/>
+      <image href="${IMG}device/device_selfcheck_product.png" x="-14" y="-19" width="28" height="38"/>
+    </g>
+  </svg>`;
+}
+
+function getMeta() {
+  return {
+    idle:    { dot: 'ok',   title: '正在充电', sub: '电量已满 · 可随时出发', bat: '86', line: '在线 · 已连接' },
+    mowing:  { dot: 'ok',   title: '正在割草', sub: '区域 1 · 已完成 45% · 剩余 38 分', bat: '74', line: '在线 · 作业中' },
+    mapping: { dot: 'ok',   title: '正在建图', sub: '区域 1 沿边中 · 已记录 24 点', bat: '82', line: '在线 · 建图中' },
+    blocked: { dot: 'bad',  title: '区域阻挡', sub: '区域 1 路径受阻 · 待处理', bat: '71', line: '异常 · 待处理' },
+  }[APP.st];
+}
+
+/* 公共：选型 3 品牌+设备合并顶栏 + 右侧消息/设置双钮 */
+function renderTopNav3(m) {
+  return `
+  <div class="hp-topbar">
+    <button class="v3-brandpill" data-act="toast" data-msg="切换设备">
+      <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+      <span class="sep"></span>
+      <span class="name"><span class="status-dot ${m.dot}"></span>后院割草机 ${ic('down', 'sm')}</span>
+    </button>
+    <div class="v3-fab-pair">
+      <button class="v3-sq-fab" data-act="toast" data-msg="消息中心（3 条未读）">${ic('msg', 'sm')}<span class="dot"></span></button>
+      <button class="v3-sq-fab" data-act="toast" data-msg="进入设备设置">${ic('gear', 'sm')}</button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   组合 A：3 顶栏 + 左下双钮胶囊 + 右侧竖排双方钮 + 单层白控台
+   ========================================================= */
+function renderPick1() {
+  const m = getMeta(), working = APP.st === 'mowing' || APP.st === 'blocked', mapping = APP.st === 'mapping';
+  return `
+  <div class="hp-screen">
+    ${statusbar()}
+    <div class="hp-map">${renderOriginalLawnMap('P1', 0)}</div>
+    <div class="hp-top-scrim"></div>
+    ${renderTopNav3(m)}
+
+    <div class="hp-bot-left-pill" style="bottom:282px">
+      <button data-act="toast" data-msg="地图管理（114 切换/编辑）">${ic('map', 'sm')}地图管理</button>
+      <span class="sep"></span>
+      <button data-act="toast" data-msg="手动遥控（车体/地图双模式）">${ic('pad', 'sm')}手动遥控</button>
+    </div>
+
+    <div class="hp-right-rail" style="bottom:282px">
+      <button class="hp-rail-btn col" title="回到机器人位置" data-act="toast" data-msg="镜头回到机器人位置">${ic('locate', 'sm')}<span>定位</span></button>
+      <button class="hp-rail-btn col num" title="刀盘高度 50mm" data-act="toast" data-msg="调整刀盘高度 50mm">${ic('blade', 'sm')}<span>50mm</span></button>
+    </div>
+
+    <section class="v1-sheet">
+      <div class="v1-head">
+        <div>
+          <div class="v1-st-title"><span class="status-dot ${m.dot}"></span><span>${m.title}</span></div>
+          <div class="v1-st-sub">${m.sub}</div>
+        </div>
+        <div class="v1-tele">
+          <div class="v1-bat"><b class="num">${m.bat}</b><span>%</span></div>
+          <button class="hp-sig-chip" data-act="openModal" data-t="1" data-k="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+        </div>
+      </div>
+
+      ${working ? `
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+          <span style="color:#325330;font-weight:600">103 分区实时进度</span>
+          <strong class="num">76 / 170 ㎡ · 45%</strong>
+        </div>
+        <div class="hp-mow-bar"><i style="width:45%"></i></div>
+      </div>` : mapping ? `
+      <div class="v1-pref-strip" data-act="toast" data-msg="正在绘制区域 1 边界（深绿实线）">
+        <span>未闭合沿边轨迹 · 点击回横屏建图继续</span>${ic('right', 'sm')}
+      </div>` : `
+      <button class="v1-pref-strip" data-act="toast" data-msg="打开割草偏好 / 定时计划">
+        <span style="display:inline-flex;align-items:center;gap:6px">${ic('blade', 'sm')}<b>刀盘 50mm</b> · 下次定时 周三 09:30</span>
+        ${ic('right', 'sm')}
+      </button>`}
+
+      <div class="v1-actions">
+        ${working ? `
+          <button class="v1-btn-main" data-act="toast" data-msg="暂停作业">${ic('pause', 'sm')}暂停作业</button>
+          <button class="v1-btn-sq" title="回桩 107" data-act="openModal" data-t="1" data-k="dock">${ic('dock')}</button>
+        ` : mapping ? `
+          <button class="v1-btn-main" data-act="toast" data-msg="继续横屏建图">${ic('pad', 'sm')}继续建图</button>
+          <button class="v1-btn-sq" title="退出" data-act="setSt" data-st="idle">${ic('close')}</button>
+        ` : `
+          <button class="v1-btn-main" data-act="setSt" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+          <button class="v1-btn-sq" title="预约计划" data-act="toast" data-msg="查看预约计划">${ic('cal')}</button>
+        `}
+      </div>
+    </section>
+
+    <nav class="hp-tabs abs">
+      <button class="on">${ic('home')}<span>首页</span></button>
+      <button data-act="toast" data-msg="进入我的">${ic('user')}<span>我的</span></button>
+    </nav>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('1')}
+  </div>`;
+}
+
+/* =========================================================
+   组合 B：3 顶栏 + 底部居中三键胶囊 + 右侧错层双浮钮 + 双栏遥测控台
+   ========================================================= */
+function renderPick2() {
+  const m = getMeta(), working = APP.st === 'mowing' || APP.st === 'blocked', mapping = APP.st === 'mapping';
+  return `
+  <div class="hp-screen">
+    ${statusbar()}
+    <div class="hp-map">${renderOriginalLawnMap('P2', 0)}</div>
+    <div class="hp-top-scrim"></div>
+    ${renderTopNav3(m)}
+
+    <div style="position:absolute;left:16px;bottom:292px;z-index:7">
+      <button style="height:44px;padding:0 14px;border-radius:14px;background:rgba(255,255,255,.96);border:1px solid rgba(240,131,0,.44);box-shadow:0 8px 20px rgba(17,19,23,.11);color:#14171C;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700" title="Dropmow 即放即割一键启动" data-act="toast" data-msg="Dropmow 一键启动安全确认">${ic('dropmow', 'sm')}<span>Dropmow</span><i style="width:6px;height:6px;border-radius:50%;background:#F08300;margin-left:1px"></i></button>
+    </div>
+
+    <div style="position:absolute;right:14px;bottom:280px;z-index:7;width:50px;border-radius:15px;background:rgba(255,255,255,.94);border:1px solid #DCE2EA;box-shadow:0 8px 20px rgba(17,19,23,.10);display:flex;flex-direction:column;overflow:hidden">
+      <button class="num" style="height:41px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:9.5px;font-weight:700;color:#1E232B" data-act="toast" data-msg="调整刀盘高度 50mm">${ic('blade', 'sm')}<span>50mm</span></button>
+      <button style="height:41px;border-top:1px solid #E6EBF1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:9.5px;font-weight:700;color:#1E232B" data-act="toast" data-msg="地图管理（114 切换/编辑）">${ic('map', 'sm')}<span>地图</span></button>
+      <button style="height:41px;border-top:1px solid #E6EBF1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:9.5px;font-weight:700;color:#1E232B" data-act="toast" data-msg="手动遥控（车体/地图双模式）">${ic('pad', 'sm')}<span>遥控</span></button>
+      <button style="height:41px;border-top:1px solid #E6EBF1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:9.5px;font-weight:700;color:#1E232B" data-act="toast" data-msg="镜头回到机器人位置">${ic('locate', 'sm')}<span>定位</span></button>
+    </div>
+
+    <section class="v3-panel">
+      <div class="v3-tele-bar">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span class="status-dot ${m.dot}"></span>
+          <strong style="font-size:15px">${m.title}</strong>
+          <span style="font-size:11.5px;color:#5B6470">· ${mapping ? '区域 1 沿边' : '区域 1~3'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <button class="hp-sig-chip" style="background:#FFFFFF" data-act="openModal" data-t="2" data-k="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+          <span class="num" style="font-size:18px;font-weight:700">${m.bat}<small style="font-size:11px;color:#5B6470">%</small></span>
+        </div>
+      </div>
+
+      <div class="v3-body">
+        ${working ? `
+          <div style="margin-bottom:13px;padding:10px 12px;border-radius:12px;background:#F4F8F4">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+              <span style="color:#325330;font-weight:600">103 分区实时进度 · 剩余 38 分</span>
+              <strong class="num">76 / 170 ㎡ · 45%</strong>
+            </div>
+            <div class="hp-mow-bar"><i style="width:45%"></i></div>
+          </div>` : mapping ? `
+          <div class="v3-two-cols">
+            <button class="v3-stat-box" data-act="toast" data-msg="当前沿边已记录 24 个路径点">
+              <div class="k">沿边路径点位</div>
+              <div class="v num">24 点 · 实线</div>
+            </button>
+            <button class="v3-stat-box" data-act="toast" data-msg="走回绿色靶心起点即闭合">
+              <div class="k">边界闭合进度</div>
+              <div class="v num">82% · 未闭合</div>
+            </button>
+          </div>` : `
+          <div class="v3-two-cols">
+            <button class="v3-stat-box tone-green" data-act="toast" data-msg="查看割草记录">
+              <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 14L40 8M8 24L42 18M6 34L40 28M10 42L36 38"/></svg>
+              <div class="stat-top"><span class="stat-ico">${ic('records', 'sm')}</span><span class="k">上次割草</span><span class="stat-pill ok">完成</span><span class="stat-arr">›</span></div>
+              <div class="v num">周二 · 170 ㎡</div>
+              <div class="stat-foot"><span class="stat-mini-bar"><i style="width:100%"></i></span><span class="stat-foot-txt">1小时12分</span></div>
+            </button>
+            <button class="v3-stat-box tone-amber" data-act="toast" data-msg="查看预约计划">
+              <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="26" cy="26" r="17" stroke-dasharray="3 4"/><path d="M26 16v10l7 4"/></svg>
+              <div class="stat-top"><span class="stat-ico">${ic('cal', 'sm')}</span><span class="k">下次定时</span><span class="stat-arr">›</span></div>
+              <div class="v num">周三 07:30</div>
+              <div class="stat-foot"><div class="stat-days"><i class="on">一</i><i>二</i><i class="on">三</i><i>四</i><i class="on">五</i><i>六</i><i>日</i></div></div>
+            </button>
+          </div>`}
+
+        <div style="display:flex;gap:10px">
+          ${working ? `
+            <button class="v3-cta-main" style="flex:1" data-act="toast" data-msg="暂停作业">${ic('pause', 'sm')}暂停作业</button>
+            <button class="v1-btn-sq" title="回桩 107" data-act="openModal" data-t="2" data-k="dock">${ic('dock')}</button>
+          ` : mapping ? `
+            <button class="v3-cta-main" style="flex:1" data-act="toast" data-msg="继续建图">${ic('pad', 'sm')}继续横屏建图</button>
+            <button class="v1-btn-sq" title="退出" data-act="setSt" data-st="idle">${ic('close')}</button>
+          ` : `
+            <button class="v3-cta-main" data-act="setSt" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+          `}
+        </div>
+      </div>
+    </section>
+
+    <nav class="hp-tabs abs">
+      <button class="on">${ic('home')}<span>首页</span></button>
+      <button data-act="toast" data-msg="进入我的">${ic('user')}<span>我的</span></button>
+    </nav>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('2')}
+  </div>`;
+}
+
+/* =========================================================
+   组合 C：3 顶栏 + 底部双钮胶囊 + 右侧竖排双钮 + 悬浮操作岛
+   ========================================================= */
+function renderPick3() {
+  const m = getMeta(), working = APP.st === 'mowing' || APP.st === 'blocked', mapping = APP.st === 'mapping';
+  return `
+  <div class="hp-screen">
+    ${statusbar()}
+    <div class="hp-map">${renderOriginalLawnMap('P3', -6)}</div>
+    <div class="hp-top-scrim"></div>
+    <div class="v2-bottom-fade"></div>
+    ${renderTopNav3(m)}
+
+    <div class="hp-bot-left-pill" style="bottom:218px">
+      <button data-act="toast" data-msg="地图管理（114 切换/编辑）">${ic('map', 'sm')}地图管理</button>
+      <span class="sep"></span>
+      <button data-act="toast" data-msg="手动遥控（车体/地图双模式）">${ic('pad', 'sm')}手动遥控</button>
+    </div>
+
+    <div class="hp-right-rail" style="bottom:218px">
+      <button class="hp-rail-btn icon-only" title="回到机器人位置" data-act="toast" data-msg="镜头回到设备">${ic('locate', 'sm')}</button>
+      <button class="hp-rail-btn num" title="刀盘高度 50mm" data-act="toast" data-msg="调整刀盘高度 50mm">${ic('blade', 'sm')}<span>50mm</span></button>
+    </div>
+
+    <section class="v2-float-island" style="bottom:78px">
+      <div style="padding:10px 15px;background:#F6F8FA;border-bottom:1px solid #EAEEF3;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="status-dot ${m.dot}"></span>
+          <strong style="font-size:14px">${m.title}</strong>
+          <span style="font-size:11.5px;color:#5B6470">· ${mapping ? '24 点未闭合' : '3 区 170 ㎡'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="hp-sig-chip" style="background:#FFFFFF" data-act="openModal" data-t="3" data-k="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+          <strong class="num" style="font-size:16px">${m.bat}<small style="font-size:10.5px;color:#5B6470">%</small></strong>
+        </div>
+      </div>
+
+      <div class="v2-island-body">
+        ${working ? `
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+              <span style="color:#325330;font-weight:600">103 实时进度</span>
+              <strong class="num">76/170㎡ · 45%</strong>
+            </div>
+            <div class="hp-mow-bar"><i style="width:45%"></i></div>
+          </div>
+          <div style="display:flex;gap:6px;flex:none">
+            <button class="v2-island-cta" style="padding:0 14px" data-act="toast" data-msg="暂停作业">${ic('pause', 'sm')}暂停</button>
+            <button class="v1-btn-sq" style="width:44px;height:44px" title="回桩 107" data-act="openModal" data-t="3" data-k="dock">${ic('dock', 'sm')}</button>
+          </div>
+        ` : mapping ? `
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">区域 1 · 未闭合沿边</div>
+            <div style="font-size:11.5px;color:#5B6470;margin-top:2px">深绿实线沿边记录中</div>
+          </div>
+          <div style="display:flex;gap:6px;flex:none">
+            <button class="v2-island-cta" style="padding:0 14px" data-act="toast" data-msg="继续建图">${ic('pad', 'sm')}继续</button>
+            <button class="v1-btn-sq" style="width:44px;height:44px" title="退出" data-act="setSt" data-st="idle">${ic('close', 'sm')}</button>
+          </div>
+        ` : `
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px">${ic('cal', 'sm')}<span>下次 周三 09:30</span></div>
+            <div style="font-size:11.5px;color:#5B6470;margin-top:2px">点击右下角开始常规割草</div>
+          </div>
+          <button class="v2-island-cta" data-act="setSt" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+        `}
+      </div>
+    </section>
+
+    <nav class="v2-float-tabs">
+      <button class="on">${ic('home', 'sm')}<span>首页</span></button>
+      <button data-act="toast" data-msg="进入我的">${ic('user', 'sm')}<span>我的</span></button>
+    </nav>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('3')}
+  </div>`;
+}
+
+function renderBlockedModal() {
+  return `
+  <div class="overlay-scrim">
+    <div class="modal-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="width:38px;height:38px;border-radius:10px;background:var(--state-warn-bg);color:var(--state-warn);display:inline-flex;align-items:center;justify-content:center">${ic('alert')}</span>
+        <div>
+          <div style="font-size:16px;font-weight:700">工作区域阻挡，无法继续</div>
+          <div style="font-size:12px;color:#5B6470">fault bit7 激活 · 不可点遮罩关闭</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+        <button class="p-btn p-btn-primary" style="width:100%" data-act="setSt" data-st="mowing">跳过当前区域（122）</button>
+        <button class="p-btn p-btn-secondary" style="width:100%" data-act="setSt" data-st="mowing">已清障，原区域恢复（105）</button>
+        <button class="p-btn p-btn-danger-soft" style="width:100%" data-act="setSt" data-st="idle">结束本次任务（106）</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSharedModal(who) {
+  if (!APP.modal || APP.modal.t !== who) return '';
+  if (APP.modal.k === 'signal') {
+    return `
+    <div class="overlay-scrim" data-act="closeModal">
+      <div class="modal-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:16px;font-weight:700">信号与网络详情（id:12）</span>
+          <button class="icon-hit" style="width:32px;height:32px" data-act="closeModal">${ic('close', 'sm')}</button>
+        </div>
+        <div class="list-card" style="margin-bottom:14px">
+          <div class="list-row"><span class="row-body"><span class="row-title">当前通道</span></span><span class="s-pill ok">Wi-Fi · Home-5G</span></div>
+          <div class="list-row"><span class="row-body"><span class="row-title">信号强度</span></span><span class="num" style="font-weight:700">88%</span></div>
+          <div class="list-row"><span class="row-body"><span class="row-title">上行 / 下行速率</span></span><span class="num" style="font-size:12px;color:#5B6470">↑ 124 · ↓ 318 kB/s</span></div>
+        </div>
+        <button class="p-btn p-btn-primary" style="width:100%" data-act="closeModal">关闭</button>
+      </div>
+    </div>`;
+  }
+  if (APP.modal.k === 'dock') {
+    return `
+    <div class="overlay-scrim" data-act="closeModal">
+      <div class="modal-card">
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px">确认返回充电桩？（107）</div>
+        <div style="font-size:12px;color:#5B6470;margin-bottom:14px">可选择回桩时是否结束当前割草任务。</div>
+        <div class="list-card" style="margin-bottom:16px">
+          <div class="list-row" data-act="togClear">
+            <div class="row-body"><div class="row-title">结束当前任务</div><div class="row-sub">清除进度，充电后不续割</div></div>
+            <span class="p-switch ${APP.dockClear ? 'on' : ''}"></span>
+          </div>
+          <div class="list-row" style="${APP.dockClear ? 'opacity:.45' : ''}" data-act="togAuto">
+            <div class="row-body"><div class="row-title">充电完成后自动恢复</div><div class="row-sub">与结束当前任务互斥</div></div>
+            <span class="p-switch ${APP.dockAuto ? 'on' : ''}"></span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="p-btn p-btn-secondary" style="flex:1" data-act="closeModal">取消</button>
+          <button class="p-btn p-btn-primary" style="flex:1" data-act="setSt" data-st="idle">确认回桩</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  return '';
+}
+
+function renderAll() {
+  const cols = [
+    { name: '组合 A · 单层白控台 + 左下胶囊 & 右侧竖钮', sub: '3 顶栏 · 底部「地图管理/遥控」· 右侧「定位/50mm」', html: renderPick1() },
+    { name: '组合 B · 双栏遥测控台 + 居中胶囊 & 右侧错层', sub: '3 顶栏 · 底部「定位/遥控/地图」· 右侧错层「50mm/预约」', html: renderPick2() },
+    { name: '组合 C · 悬浮操作岛 + 底部胶囊 & 右侧双钮', sub: '3 顶栏 · 底部「地图管理/遥控」· 右侧「定位/50mm」+ 胶囊 Tab', html: renderPick3() },
+  ];
+  document.getElementById('grid').innerHTML = cols.map(c => `
+    <section class="variant-col">
+      <div class="variant-meta"><span class="name">${c.name}</span><span class="sub">${c.sub}</span></div>
+      <div class="device-chassis">${c.html}</div>
+    </section>
+  `).join('');
+
+  document.querySelectorAll('#stCtrl button').forEach(b => b.classList.toggle('on', b.dataset.st === APP.st));
+  document.querySelectorAll('#traceCtrl button').forEach(b => b.classList.toggle('on', b.dataset.tr === APP.trace));
+}
+
+let toastT = null;
+function showToast(msg) {
+  document.querySelector('.proto-toast')?.remove();
+  clearTimeout(toastT);
+  const el = document.createElement('div');
+  el.className = 'proto-toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  toastT = setTimeout(() => el.remove(), 2200);
+}
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-st],[data-tr],[data-act]');
+  if (!btn) return;
+  if (btn.dataset.act === 'setSt') { APP.st = btn.dataset.st; APP.modal = null; return renderAll(); }
+  if (btn.dataset.st) { APP.st = btn.dataset.st; APP.modal = null; return renderAll(); }
+  if (btn.dataset.tr) { APP.trace = btn.dataset.tr; return renderAll(); }
+
+  const act = btn.dataset.act;
+  if (act === 'openModal') { APP.modal = { t: btn.dataset.t, k: btn.dataset.k }; renderAll(); }
+  else if (act === 'closeModal') { if (btn.classList.contains('overlay-scrim') && e.target !== btn) return; APP.modal = null; renderAll(); }
+  else if (act === 'togClear') { APP.dockClear = !APP.dockClear; if (APP.dockClear) APP.dockAuto = false; renderAll(); }
+  else if (act === 'togAuto') { if (!APP.dockClear) { APP.dockAuto = !APP.dockAuto; renderAll(); } }
+  else if (act === 'toast') showToast(btn.dataset.msg || '操作已触发');
+});
+
+renderAll();
+</script>
+</body>
+</html>

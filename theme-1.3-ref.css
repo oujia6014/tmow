@@ -1,0 +1,118 @@
+/* 1.3 视觉改版（只用于原型，未落 Flutter）：取自 logo 的「石墨黑 + 品牌橙 + 45° 切角」。
+   方案见 ../alpha-1.3/codex-visual.md；在 index.html 内联样式之后加载，覆盖 tokens.css 的取值。
+   与 docs/rules/visual.md 冲突的点（主色绿、卡片圆角 16、正文 12）已由用户确认只在原型里试，落地前另行评审。 */
+:root{
+  --color-primary:#111315;            /* 操作主色：白字 18.6:1 */
+  --color-text-primary:#111315;
+  --color-text-secondary:#596168;     /* 白底 6.3:1（原 #999 只有 2.85:1） */
+  --color-text-disabled:#7A838B;
+  --color-border:#D8DEE2;
+  --color-background:#F1F3F4;
+  --color-surface-muted:#F1F3F4;
+  --color-background-top-tint:#F1F3F4;
+  --color-state-success:#167044; --color-state-success-surface:#EAF5EE;
+  --color-state-warning:#705300; --color-state-warning-surface:#FFF4C2;
+  --color-state-danger:#B42332;  --color-state-danger-surface:#FFF0F1;
+  --color-state-info:#185B99;    --color-state-info-surface:#EAF3FC;
+  --color-control-border:#7A838B;
+  --color-overlay:rgba(17,19,21,.08);
+  --radius-card:8px;
+  --control-regular:48px;
+  /* 只放大说明和正文，标题保持 14（紧凑基线另行评审） */
+  --font-size-caption:12px;
+  --font-size-body:14px;
+  --brand-cut:10px;
+}
+
+/* 按钮：去胶囊；主按钮右上角 45° 切角，呼应 logo 的 O */
+.btn{border-radius:var(--radius-sm)}
+.btn-primary:not(:disabled){clip-path:polygon(0 0,calc(100% - var(--brand-cut)) 0,100% var(--brand-cut),100% 100%,0 100%)}
+.btn-secondary{background:var(--color-surface);box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-control-border)}
+.btn:disabled{background:#E4E7E9}
+.btn-round.danger{box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-state-danger)}
+
+/* 分段控件：选中黑底白字，不靠投影区分 */
+.seg{border-radius:var(--radius-sm)}
+.seg button{border-radius:var(--radius-xs)}
+.seg button.on{background:var(--color-primary);color:var(--color-surface);box-shadow:none}
+
+/* 卡片 / 分组 / 面板：小圆角、实底、细边 */
+.group{border-radius:var(--radius-sm)}
+.panel, .sheet{border-radius:var(--radius-md) var(--radius-md) 0 0}
+.card{border-radius:var(--radius-sm)}
+.fab{border-radius:var(--radius-sm);box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-border), var(--shadow-overlay)}
+.pill{border-radius:var(--radius-sm)}
+.cell .ci{background:var(--color-surface-muted);color:var(--color-text-primary)}
+.empty-block .bigico{background:var(--color-surface-muted);color:var(--color-text-primary)}
+.alert{border-radius:var(--radius-sm)}
+
+.state-dot.idle{background:var(--color-state-info)}
+
+/* 进度条：纯黑填充。橙色不表达运行 / 进度，撤掉 1.2 的橙色前端 */
+.progress, .mprog{height:6px;border-radius:2px;background:var(--color-border)}
+.progress i, .mprog i{background:var(--color-primary)}
+
+/* 建图步骤、勾选、序号、开关：随主色变黑 */
+.ms.on{background:var(--color-primary)}
+.ms.done{color:var(--color-state-success)}
+
+/* 摇杆头：石墨黑，不再是绿色渐变 */
+.joy .knob{background:radial-gradient(circle at 35% 30%,#3A3F44,var(--color-primary) 65%)}
+
+/* 数字统一 DIN 粗体（DIN Alternate 为 Apple 系统字体，落地需确认 Android 回退） */
+.display, .vitals, .jspeed b, .mcount b, .stats3 .title, .sum .title, .ota-bar .caption{font-family:"DIN Alternate","Barlow Semi Condensed",var(--font-family);font-variant-numeric:tabular-nums}
+.vitals{font-weight:700}
+
+/* ---------- 品牌橙：只表示「这是我的 T-MOW / 我正在推进」，不表达任何设备状态 ---------- */
+:root{--color-brand-tint:#FFF1DF}
+
+/* 设备铭牌：左侧橙区，右缘是固定 8px 的斜接缝（取自 logo 的 T / W 斜笔画），不随容器高度变形 */
+.brand-plate{position:relative;overflow:hidden}
+.brand-plate::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--plate-w,10px);pointer-events:none;
+  background:var(--color-brand-accent);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.devcard.brand-plate{--plate-w:22px;padding-left:30px}
+.pill.brand-plate{--plate-w:14px;padding-left:20px}
+
+/* 推进按钮：黑色主体 + 右侧橙色端区（黑色箭头），一个点击目标；暂停 / 结束 / 等待态不加 */
+.btn-push:not(:disabled){position:relative;padding-right:60px;clip-path:none}
+.btn-push:not(:disabled)::after{content:"";position:absolute;right:0;top:0;bottom:0;width:48px;pointer-events:none;
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  clip-path:polygon(10px 0,100% 0,100% 100%,0 100%);
+  background:var(--color-brand-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111315' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") no-repeat 60% 50%/20px}
+
+/* 用户选择的选中项：黑底 + 内嵌 3px 橙色斜线（设备进度驱动的建图步骤条不用） */
+.seg button.on{position:relative}
+.seg button.on::after{content:"";position:absolute;left:8px;right:8px;bottom:3px;height:3px;background:var(--color-brand-accent);
+  clip-path:polygon(0 0,100% 0,calc(100% - 3px) 100%,0 100%);pointer-events:none}
+
+
+/* 首页顶部：地图向上渐隐到地图底色，状态栏与顶栏不再硬压在地图上 */
+.page > .map::before{content:"";position:absolute;left:0;right:0;top:0;height:160px;z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,var(--color-mode-preview-background) 0%,rgba(242,244,233,.85) 45%,rgba(242,244,233,0) 100%)}
+
+/* ---------- 1.3 taste-skill 整理（Achromatic ledger）：外壳无彩，颜色只给割草数据 ---------- */
+:root{
+  /* 地图底色取花园的鼠尾草灰白；草坪降饱和，镜像值需同步 TMapVisualTokens（落地另立项） */
+  --color-mode-preview-background:#F2F5F2;
+  /* 唯一数据色：已割轨迹 / 今日割草进度。橙色仍只表示身份，不表达进度 */
+  --color-data:#2F6B2A;
+  /* 户外可读：数据与标签 14，次要说明 12，标题 16 */
+  --font-size-label:14px;
+  --font-size-title:16px;
+}
+/* 顶部渐隐终点色随地图底色更新 */
+.page > .map::before{background:linear-gradient(to bottom,var(--color-mode-preview-background) 0%,rgba(242,245,242,.85) 45%,rgba(242,245,242,0) 100%)}
+
+/* 静止元素不带阴影：悬浮按钮、卡片改用白底 + 细边；底部面板 / 弹层 / toast 是浮层，保留 */
+.fab{box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-border)}
+.card{box-shadow:none;border:var(--stroke-hairline) solid var(--color-border)}
+.pill{box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-border)}
+
+/* 今日割草带：进度用数据色，后面是实际面积 */
+.today-strip{display:flex;align-items:center;gap:var(--space-md)}
+.today-strip .progress{flex:1}
+.today-strip .progress i, .progress i{background:var(--color-data)}
+.today-strip .caption{white-space:nowrap;color:var(--color-text-secondary)}
+.today-strip b{color:var(--color-text-primary);font-family:"DIN Alternate","Barlow Semi Condensed",var(--font-family);font-variant-numeric:tabular-nums}
+.today-strip .progress{margin:0}
+.today-strip{margin-top:var(--space-sm)}

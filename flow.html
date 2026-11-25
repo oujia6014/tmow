@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T-MOW 1.4 交互流程总览</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "MiSans", sans-serif;
+    background: #E4E9F0;
+    color: #14171C;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 256px; z-index: 2;
+    overflow-y: auto; background: #FFFFFF; border-right: 1px solid #D8E0EA;
+    padding: 22px 16px 28px 18px;
+  }
+  main { margin-left: 256px; padding-bottom: 48px; }
+  h1 { font-size: 16px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .pill14 {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+    background: #F0F3F7; color: #14171C; border: 1px solid #CFD7E2; border-bottom: 2px solid #F08300;
+  }
+  header p { font-size: 12px; color: #5B6470; margin-top: 8px; line-height: 1.55; }
+  .ctrl-box {
+    margin-top: 14px; padding: 10px; border-radius: 11px;
+    background: #F4F6FA; border: 1px solid #E1E6EE;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .ctrl-title { font-size: 11px; font-weight: 700; color: #5B6470; }
+  .seg-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .seg-row button {
+    border: 1px solid #D5DCE6; background: #FFFFFF; color: #5B6470;
+    border-radius: 7px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; cursor: pointer;
+  }
+  .seg-row button.on { background: #1E232B; color: #FFFFFF; border-color: #1E232B; }
+  .filter { display: flex; gap: 6px; align-items: center; font-size: 12px; color: #2B333E; cursor: pointer; }
+  .quick-links { margin-top: 12px; display: flex; gap: 6px; }
+  .quick-links a {
+    flex: 1; text-align: center; font-size: 11.5px; font-weight: 600;
+    padding: 6px 8px; border-radius: 8px; border: 1px solid #D5DCE6;
+    background: #FFFFFF; color: #14171C; text-decoration: none;
+  }
+  .quick-links a:hover { background: #F3F5F8; }
+  nav { display: flex; flex-direction: column; gap: 2px; margin-top: 16px; }
+  nav a { display: block; font-size: 12.5px; font-weight: 600; padding: 7px 9px; border-radius: 8px; color: inherit; text-decoration: none; }
+  nav a.sub { font-size: 11.5px; font-weight: 400; color: #5B6470; padding: 4px 9px 4px 20px; }
+  nav a:hover { background: #F1F4F8; }
+
+  section { margin: 20px 28px 0; padding: 20px 22px 24px; background: #F5F7FA; border: 1px solid #DDE3EC; border-radius: 18px; scroll-margin-top: 18px; }
+  .lane { scroll-margin-top: 18px; }
+  h2 { font-size: 17px; letter-spacing: -0.015em; }
+  .lane + .lane { margin-top: 24px; padding-top: 18px; border-top: 1px solid #DFE5EE; }
+  .lane h3 { font-size: 13px; font-weight: 600; color: #5B6470; margin: 10px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .lane h3::before { content: ""; width: 3px; height: 12px; border-radius: 2px; background: #F08300; }
+  .row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 28px 28px; }
+
+  :root { --zoom: 1; --s: calc(.31 * var(--zoom)); --sl: calc(.42 * var(--zoom)); --bs: calc(.22 * var(--zoom)); --bsl: calc(.32 * var(--zoom)); }
+  .col { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+  .col + .col::before { content: ""; position: absolute; left: -28px; top: calc(64px * var(--zoom)); width: 20px; border-top: 2px solid #9DA6B4; }
+  .col + .col::after { content: ""; position: absolute; left: -10px; top: calc(59px * var(--zoom)); border: 6px solid transparent; border-left: 8px solid #9DA6B4; border-right: 0; }
+  .col.ls + .col::before, .col + .col.ls::before { top: calc(76px * var(--zoom)); }
+  .col.ls + .col::after, .col + .col.ls::after { top: calc(71px * var(--zoom)); }
+  .card { display: flex; flex-direction: column; gap: 5px; }
+  .frame { width: calc(412px * var(--s)); height: calc(866px * var(--s)); overflow: hidden; border-radius: calc(54px * var(--s)); background: #16171B; box-shadow: 0 8px 20px -8px rgba(17, 19, 23, .28); }
+  iframe { width: 412px; height: 866px; border: 0; transform: scale(var(--s)); transform-origin: 0 0; background: transparent; display: block; }
+  .ls > .card .frame { width: calc(866px * var(--sl)); height: calc(412px * var(--sl)); border-radius: calc(54px * var(--sl)); }
+  .ls > .card iframe { width: 866px; height: 412px; transform: scale(var(--sl)); }
+  .cap { display: flex; align-items: baseline; gap: 6px; font-size: 12px; width: 100%; }
+  .cap .no { color: #8A94A2; font-variant-numeric: tabular-nums; }
+  .cap .n { flex: 1; min-width: 0; font-weight: 600; }
+  .cap a { color: #5B6470; text-decoration: none; font-size: 11px; white-space: nowrap; }
+  .cap a:hover { color: #14171C; text-decoration: underline; }
+
+  .br { position: relative; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding: 10px; background: rgba(255, 255, 255, .55); border: 1.5px dashed #C3CBD6; border-radius: 14px; }
+  .br::before { content: ""; position: absolute; left: 24px; top: -22px; height: 20px; border-left: 1.5px dashed #C3CBD6; }
+  .br .card { width: auto; }
+  .br .frame { width: calc(412px * var(--bs)); height: calc(866px * var(--bs)); border-radius: calc(54px * var(--bs)); box-shadow: none; }
+  .br iframe { transform: scale(var(--bs)); }
+  .br .ls .frame { width: calc(866px * var(--bsl)); height: calc(412px * var(--bsl)); border-radius: calc(54px * var(--bsl)); }
+  .br .ls iframe { width: 866px; height: 412px; transform: scale(var(--bsl)); }
+  .br .cap { flex-direction: column; align-items: flex-start; gap: 2px; width: calc(412px * var(--bs)); }
+  .br .ls .cap { width: calc(866px * var(--bsl)); }
+
+  .tag { font-size: 10px; padding: 1px 6px; border-radius: 5px; background: #FFFFFF; color: #5B6470; border: 1px solid #E1E6EE; white-space: nowrap; }
+  .tag.bad { background: #FFECEF; color: #C22736; border-color: #F4C2C7; }
+  .mk { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 5px; white-space: nowrap; }
+  .mk-code { background: #E4F5EC; color: #16794B; border: 1px solid #BCE3CE; }
+  .mk-plan { background: #EDE9FE; color: #5B3FD6; border: 1px solid #D4CBFD; }
+  .mk-tbd  { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+
+  body.flat .frame { background: none; border-radius: 0; box-shadow: none; }
+  header, main { transition: transform .2s, margin-left .2s; }
+  body.nav-off header { transform: translateX(-100%); }
+  body.nav-off main { margin-left: 0; }
+  #navToggle {
+    position: fixed; top: 12px; left: 264px; z-index: 3; width: 28px; height: 28px;
+    border-radius: 8px; border: 1px solid #DCE2EA; background: #FFFFFF; color: #14171C;
+    font-size: 14px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .08); transition: left .2s;
+  }
+  body.nav-off #navToggle { left: 12px; }
+  .zoom-row { display: flex; align-items: center; gap: 6px; }
+  .zoom-btn {
+    width: 26px; height: 26px; border-radius: 7px; border: 1px solid #D5DCE6;
+    background: #FFFFFF; color: #14171C; font-size: 14px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+  }
+  .zoom-btn:hover { background: #EEF2F7; }
+  .zoom-range { flex: 1; min-width: 0; accent-color: #1E232B; cursor: pointer; }
+  .zoom-val {
+    min-width: 44px; text-align: center; font-size: 11.5px; font-weight: 700;
+    color: #14171C; font-variant-numeric: tabular-nums; background: #FFFFFF;
+    border: 1px solid #D5DCE6; border-radius: 6px; padding: 3px 5px; cursor: pointer;
+  }
+  .zoom-fab {
+    position: fixed; right: 18px; bottom: 18px; z-index: 4;
+    display: flex; align-items: center; gap: 4px; padding: 5px 6px;
+    border-radius: 12px; background: rgba(255, 255, 255, .94); backdrop-filter: blur(8px);
+    border: 1px solid #D5DCE6; box-shadow: 0 8px 24px rgba(17, 19, 23, .14);
+  }
+  .zoom-fab .seg-row { flex-wrap: nowrap; }
+  .zoom-fab .seg-row button { padding: 4px 7px; font-size: 11px; }
+
+  /* 第 0 章：横向视觉设计规范展板 */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .spec-card {
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .spec-card h4 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #14171C;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spec-card h4::before {
+    content: "";
+    width: 3px;
+    height: 12px;
+    border-radius: 2px;
+    background: #F08300;
+  }
+  .spec-sub { font-size: 11px; font-weight: 600; color: #7F8996; margin-bottom: 6px; }
+  .swatch-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .swatch { display: flex; flex-direction: column; gap: 4px; }
+  .swatch i { display: block; height: 32px; border-radius: 8px; border: 1px solid rgba(20, 23, 28, .08); }
+  .swatch b { font-size: 11px; color: #14171C; font-variant-numeric: tabular-nums; }
+  .swatch span { font-size: 10.5px; color: #5B6470; }
+  .type-list { display: flex; flex-direction: column; gap: 8px; }
+  .type-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid #EEF2F6; }
+  .type-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .type-meta { font-size: 11px; color: #7F8996; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sp-list { display: flex; flex-direction: column; gap: 8px; }
+  .sp-row { display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: #5B6470; font-variant-numeric: tabular-nums; }
+  .sp-row span:first-child { width: 64px; flex: none; }
+  .sp-bar { height: 10px; border-radius: 4px; background: linear-gradient(90deg, #1E232B 0%, #F08300 100%); }
+  .rad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .rad-item { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; color: #5B6470; }
+  .rad-box { width: 100%; height: 34px; background: #1E232B; color: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .nav-demo { border: 1px solid #E2E7EE; border-radius: 12px; overflow: hidden; background: #F5F7FA; }
+  .nav-demo-top { height: 40px; background: #FFFFFF; border-bottom: 1px solid #EEF2F6; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; font-weight: 700; color: #14171C; }
+  .nav-demo-tab { height: 48px; background: #FFFFFF; border-top: 1px solid #EEF2F6; display: grid; grid-template-columns: 1fr 1fr; }
+  .nav-demo-tab > div { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: #7F8996; }
+  .nav-demo-tab > div.on { color: #14171C; font-weight: 700; }
+  .nav-demo-tab > div.on i { width: 18px; height: 2px; border-radius: 2px; background: #F08300; display: block; }
+  .btn-demo-list { display: flex; flex-direction: column; gap: 9px; }
+  .btn-demo-main { height: 40px; border-radius: 12px; background: #1E232B; color: #FFFFFF; font-size: 13px; font-weight: 600; display: flex; align-items: stretch; overflow: hidden; }
+  .btn-demo-main .t { flex: 1; display: flex; align-items: center; justify-content: center; padding-left: 10px; }
+  .btn-demo-main .w { width: 44px; background: #F08300; display: flex; align-items: center; justify-content: center; clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%); }
+  .btn-demo-sec { height: 38px; border-radius: 12px; background: #F3F5F8; color: #14171C; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .btn-demo-dis { height: 38px; border-radius: 12px; background: #E2E6EB; color: #939CA8; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .btn-demo-del { height: 38px; border-radius: 12px; background: #D92D20; color: #FFFFFF; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  @media (max-width: 640px) {
+    header { position: static; width: auto; border-right: 0; padding: 16px; }
+    main { margin-left: 0; }
+    section { margin: 14px 10px 0; padding: 14px; }
+    #navToggle { display: none; }
+    .zoom-fab { right: 10px; bottom: 10px; }
+  }
+</style>
+</head>
+<body>
+<button id="navToggle" aria-label="收起左栏">«</button>
+<header>
+  <h1>T-MOW 1.4 流程总览 <span class="pill14">6 模块</span></h1>
+  <p>按 <b>视觉规范、配对绑定、设备建图、主页状态、割草设置、我的</b> 六个模块梳理全部界面标准与业务流程，支持交互查看与画布缩放。</p>
+
+  <div class="ctrl-box">
+    <div class="ctrl-title">画布缩放（或 Ctrl + 滚轮 / 捏合）</div>
+    <div class="zoom-row">
+      <button type="button" class="zoom-btn" data-zstep="-0.25" aria-label="缩小">−</button>
+      <input type="range" class="zoom-range" id="zoomRange" min="0.7" max="3.2" step="0.05" value="1">
+      <button type="button" class="zoom-btn" data-zstep="0.25" aria-label="放大">+</button>
+      <button type="button" class="zoom-val" id="zoomVal" title="点击复位 100%">100%</button>
+    </div>
+    <div class="seg-row" id="zoomSeg">
+      <button data-z="1">100%</button>
+      <button data-z="1.5">150%</button>
+      <button data-z="2">200%</button>
+      <button data-z="3">300%</button>
+    </div>
+    <div class="ctrl-title" style="margin-top:4px">界面风格切换</div>
+    <div class="seg-row" id="themeSeg">
+      <button class="on" data-t="14">1.4 新版</button>
+      <button data-t="13">1.3 旧版</button>
+      <button data-t="v1">早期绿色</button>
+    </div>
+    <label class="filter"><input type="checkbox" id="flat"> 去掉手机外框</label>
+  </div>
+
+  <div class="quick-links">
+    <a href="visual-preview.html">4 屏样板</a>
+    <a href="index.html">单机原型</a>
+  </div>
+  <nav id="nav"></nav>
+</header>
+<div class="zoom-fab" id="zoomFab" aria-label="快捷缩放">
+  <button type="button" class="zoom-btn" data-zstep="-0.25" aria-label="缩小">−</button>
+  <button type="button" class="zoom-val" id="zoomFabVal" title="点击复位 100%">100%</button>
+  <button type="button" class="zoom-btn" data-zstep="0.25" aria-label="放大">+</button>
+  <div class="seg-row" style="margin-left:2px">
+    <button data-z="1">1x</button>
+    <button data-z="2">2x</button>
+    <button data-z="3">3x</button>
+  </div>
+</div>
+<main id="main"></main>
+
+<script>
+const S = (name, hash, o = {}, br = []) => ({ name, hash, ...o, br });
+const B = (name, hash, tag, o = {}) => ({ name, hash, tag, ...o });
+const LS = { ls: 1 };
+
+const FLOW = [
+  ['一、配对绑定', [
+    ['启动与账号登录', [
+      S('App 启动页', 'page=splash', { st: 'code', c: '1.4' }),
+      S('密码登录（隐私勾选）', 'page=login&loginMode=pwd', { st: 'code', c: '1.4-1' }, [
+        B('验证码登录', 'page=login&loginMode=code', '双Tab', { st: 'code', c: '1.4-1' }),
+        B('登录前隐私摘要', 'page=login&sheet=privacyDocSheet', '协议摘要', { st: 'code', c: '1.4-1' }),
+        B('注册账号', 'page=register', '账号', { st: 'code', c: '1.4-1' }),
+        B('重置密码', 'page=resetPwd', '密码', { st: 'code', c: '1.4-1' }),
+      ]),
+      S('空设备首页（添加引导）', 'page=home&count=0', { st: 'code', c: '1.4' }),
+    ]],
+    ['添加割草机与蓝牙配网', [
+      // 暂不显示：S('选择设备或配件', 'page=addDevice', { st: 'code', c: '1.4-2' })
+      S('进入配网状态', 'page=prov&provKind=mower&provStep=0', { st: 'code', c: '1.4-2' }, [
+        B('扫码绑定 X5', 'page=scanAdd', '扫码配网', { st: 'code', c: '1.4-2' }),
+        B('手动输入 SN', 'page=scanAdd&sheet=manualSnSheet', '手动输入', { st: 'code', c: '1.4-2' }),
+      ]),
+      S('发现 1 台割草机', 'page=prov&provKind=mower&provStep=1', { f: 2000, st: 'code', c: '1.4-2' }),
+      S('蓝牙连接中', 'page=prov&provKind=mower&provStep=2', { f: 400, st: 'code', c: '1.4-2' }, [
+        B('已被绑定拦截', 'page=prov&provKind=mower&provStep=1&provResult=bound', '失败', { bad: 1, f: 2000, st: 'code', c: '1.4-2' }),
+        B('SN 不一致异常', 'page=prov&provKind=mower&provStep=1&provResult=snMismatch', '异常', { bad: 1, f: 2000, st: 'code', c: '1.4-2' }),
+      ]),
+      S('连接 Wi-Fi', 'page=prov&provKind=mower&provStep=3', { st: 'code', c: '1.4-2' }),
+      S('正在联网（配网进度）', 'page=prov&provKind=mower&provStep=4&provProg=2', { st: 'code', c: '1.4-2' }),
+      S('配网结果（含 4G 提示）', 'page=prov&provKind=mower&provStep=4', { f: 3800, st: 'code', c: '1.4-2' }, [
+        B('Wi-Fi 失败', 'page=prov&provKind=mower&provStep=4&provResult=pwd', '失败', { bad: 1, f: 2200, st: 'code', c: '1.4-2' }),
+        B('云端失败', 'page=prov&provKind=mower&provStep=4&provResult=cloud', '失败', { bad: 1, f: 3000, st: 'code', c: '1.4-2' }),
+        B('配对超时弹窗', 'page=prov&provKind=mower&provStep=4&provResult=timeout', '超时', { bad: 1, f: 2000, st: 'code', c: '1.4-2' }),
+      ]),
+    ]],
+    ['通信网关 S3 与无线配对', [
+      S('S3 配件配网引导', 'page=prov&provKind=gw&provStep=0', { st: 'code', c: '1.4-2' }),
+      S('S3 发现与联网', 'page=prov&provKind=gw&provStep=2', { st: 'code', c: '1.4-2' }, [
+        B('网关 Wi-Fi 分支', 'page=prov&provKind=gw&provStep=2&gwWired=wifi', '无线', { st: 'code', c: '1.4-2' }),
+        B('S3 联网进度中', 'page=prov&provKind=gw&provStep=3&provProg=2', '进度', { st: 'code', c: '1.4-2' }),
+      ]),
+      S('S3 已在线三选一弹窗', 'page=prov&provKind=lora&s3OnlineState=online', { st: 'code', c: '1.4-2' }, [
+        B('S3 离线提醒', 'page=prov&provKind=lora&s3OnlineState=offline', '拦截', { bad: 1, st: 'code', c: '1.4-2' }),
+      ]),
+      S('LoRa 配对进度页', 'page=prov&provKind=lora&s3OnlineState=new', { st: 'code', c: '1.4-2' }),
+      S('首页 · 绑定完成', 'page=home&state=idle', { st: 'code', c: '1.4' }),
+    ]],
+  ]],
+
+  ['二、设备建图', [
+    ['【未建图】首页与临时割草', [
+      S('首页 · 未建图', 'page=home&state=nomap', { c: '1.3-3' }, [
+        B('临时割草安全提示', 'page=home&state=nomap&sheet=dropmow', '即放即割', { c: '1.4-3' }),
+        B('临时割草运行中', 'page=home&state=mowing&dropmowActive=1', '暂停/结束', { c: '1.4-3' }),
+        B('结束割草弹窗', 'page=home&state=mowing&dropmowActive=1&dropmowOrigin=nomap&sheet=dropmowSave', '是否建图', { c: '1.4-3' }),
+      ]),
+      S('引导页 1 · 建图是什么', 'page=mapGuide1', { c: '建图引导' }),
+      S('引导页 2 · 充电桩位置', 'page=mapGuide2', { c: '建图引导' }),
+      S('建图前检查（5 项）', 'page=mapPrecheck&pre=ok', { c: '5项校验' }, [
+        B('未在充电桩上提示', 'page=mapPrecheck&pre=offdock', '重新检测', { bad: 1, c: '5项校验' }),
+      ]),
+    ]],
+    ['【未建图】横屏建图流程（遥控划区 · 新建草坪 · 保存）', [
+      S('设置起点', 'page=mapping&mp=driveToStart', { ...LS, c: '双摇杆' }),
+      S('手动建图模式（默认）', 'page=mapping&mp=edgeManual', { ...LS, c: '默认模式' }, [
+        B('自动建图模式', 'page=mapping&mp=edgeAuto', '下拉/拨摇杆切回', { ...LS, c: '可切回' }),
+        B('实体遥控器接管中', 'page=mapping&mp=edgeManual&rcTakeover=1', '摇杆失效', { ...LS, c: '物理互斥' }),
+        B('退出建图二次确认', 'page=mapping&mp=edgeManual&mdlg=cancelMapping', '退出确认', { ...LS, c: '二次确认' }),
+      ]),
+      S('草坪完成总览页', 'page=mapping&mp=regionSummary', { ...LS, c: '保存/覆盖/新增' }, [
+        B('覆盖已有地图', 'page=mapping&mp=coverageManual', '可选分支', { ...LS, c: '覆盖约XX%' }),
+        B('建图异常态', 'page=mapping&mp=edgeManual&mapExc=fault', '急停', { bad: 1, ...LS, c: '1.3-21' }),
+      ]),
+      S('新建草坪（起点→终点）', 'page=mapping&mp=channelPrep', { ...LS, c: '新建草坪' }, [
+        B('新建草坪录制中', 'page=mapping&mp=channelRec', '到达终点', { ...LS, c: '新建草坪' }),
+      ]),
+      S('保存回待机首页', 'page=home&state=idle', { c: '保存完成' }),
+    ]],
+    ['地图管理与横屏编辑', [
+      S('地图列表与切换', 'page=mapList', { c: '1.4-7' }, [
+        B('云端删图失败重试', 'page=mapList&mapDelErr=1', '重试补偿', { bad: 1, c: '1.4-7' }),
+        B('空状态', 'page=mapList&data=empty', '无地图', { c: '1.4-7' }),
+      ]),
+      S('横屏地图编辑（直选草坪/通道）', 'page=mapEdit', { ...LS, c: '横屏编辑' }, [
+        B('未在地图内异常', 'page=mapEdit&mapEditCheck=outOfMap&mdlg=outOfMap', '范围校验', { bad: 1, ...LS, c: '弹窗拦截' }),
+        B('定位失败异常', 'page=mapEdit&mapEditCheck=locFail&mdlg=locFail', '雷达遮蔽', { bad: 1, ...LS, c: '弹窗拦截' }),
+      ]),
+    ]],
+    ['手动遥控模式（竖屏 / 横屏）', [
+      S('安全须知弹窗', 'page=joystick&joyOrient=portrait&joyDlg=safe', { st: 'code', c: '1.4-4' }),
+      S('手动遥控 · 竖屏', 'page=joystick&joyOrient=portrait&joyMode=body', { st: 'code', c: '1.4-4' }, [
+        B('地图正北模式', 'page=joystick&joyOrient=portrait&joyMode=map', '方向模式', { st: 'code', c: '1.4-4' }),
+        B('左手模式', 'page=joystick&joyOrient=portrait&jHand=left', '左右手', { st: 'code', c: '1.4-4' }),
+      ]),
+      S('横屏遥控 + 参数面板', 'page=joystick&joyOrient=land&joyMode=map', { ...LS, st: 'code', c: '1.4-4' }),
+    ]],
+  ]],
+
+  ['三、设备主页控制面板状态', [
+    ['日常作业与控制状态', [
+      S('待机充电', 'page=home&state=idle', { c: '1.4' }, [
+        B('切换设备弹窗', 'page=home&count=2&sheet=switch', '多设备', { c: '1.4' }),
+        B('网络与信号详情', 'page=home&sheet=sigDetail', '网络', { c: '1.4-3' }),
+        B('开始割草弹层', 'page=home&sheet=start', '选区启动', { c: '1.4-3' }),
+      ]),
+      S('割草作业中', 'page=home&state=mowing', { f: 1400, c: '1.4-3' }, [
+        B('回桩二次确认', 'page=home&state=mowing&sheet=dockConfirm', '断点确认', { c: '1.4-3' }),
+      ]),
+      S('已暂停', 'page=home&state=paused', { c: '1.4-3' }),
+      S('正在回桩', 'page=home&state=returning', { c: '1.4-3' }),
+      S('指令处理中（等待回执）', 'page=home&state=pending', { c: '1.4-3' }),
+    ]],
+    ['异常与阻挡状态', [
+      S('设备离线', 'page=home&state=offline', { c: '1.4-3' }),
+      S('设备故障（被抬起）', 'page=home&state=fault', { bad: 1, c: '1.4-3' }),
+      S('草坪区域受阻', 'page=home&state=blocked', { bad: 1, c: '1.4-3' }),
+      S('回桩对准失败 3 次', 'page=home&state=dockFail', { bad: 1, c: '1.3-19' }),
+    ]],
+    ['特殊占用与前置状态', [
+      S('未建图', 'page=home&state=nomap', { c: '1.3-3' }),
+      S('正在建图（返回首页）', 'page=home&state=mapping', { c: '1.4' }),
+      S('固件升级中', 'page=home&state=upgrading', { c: '1.4-6' }),
+    ]],
+  ]],
+
+  ['四、割草设置', [
+    ['定时任务', [
+      S('定时列表', 'page=schedules', { st: 'tbd', c: '1.3-16' }, [
+        B('空状态', 'page=schedules&data=empty', '无定时', { st: 'tbd', c: '1.3-16' }),
+      ]),
+      S('定时编辑', 'page=scheduleEdit', { st: 'tbd', c: '1.3-16' }, [
+        B('时间冲突弹层', 'page=scheduleEdit&sheet=schedConflict', '校验', { bad: 1, st: 'tbd', c: '1.3-16' }),
+        B('地图删除重选', 'page=scheduleEdit&schedMapMissing=1', '异常', { bad: 1, st: 'tbd', c: '1.3-16' }),
+      ]),
+    ]],
+    ['割草记录与故障详情', [
+      S('割草记录列表', 'page=records', { st: 'code', c: '1.4-7' }, [
+        B('空状态', 'page=records&data=empty', '无记录', { st: 'code', c: '1.4-7' }),
+        B('记录 · 待开始', 'page=recordDetail&recIdx=0', '待开始', { st: 'code', c: '1.4-7' }),
+      ]),
+      S('记录 · 完成', 'page=recordDetail&recIdx=1', { st: 'code', c: '1.4-7' }, [
+        B('记录 · 故障中断', 'page=recordDetail&recIdx=5', '失败', { bad: 1, st: 'code', c: '1.4-7' }),
+      ]),
+      S('故障详情页', 'page=fault', { bad: 1, st: 'code', c: '1.4-3' }),
+    ]],
+    ['设备设置与偏好', [
+      S('设备设置', 'page=settings', { st: 'code', c: '1.4' }, [
+        B('成员视角设置', 'page=settings&role=member', '成员', { st: 'code', c: '1.4' }),
+        B('远程关机确认', 'page=settings&sheet=powerOffConfirm', '二次确认', { bad: 1, st: 'code', c: '1.4-3' }),
+      ]),
+      S('割草偏好（高度/传感器）', 'page=mowPrefs', { st: 'code', c: '1.4-8' }, [
+        B('离线禁用状态', 'page=mowPrefs&state=offline', '禁用', { st: 'code', c: '1.4-8' }),
+      ]),
+      S('刀片保养', 'page=bladeCare', { st: 'plan', c: '1.3-11' }),
+      S('机器位置', 'page=machinePos', { st: 'plan', c: '1.3-11' }),
+      S('4G 备用网络', 'page=lte4g&lteSt=active', { st: 'tbd', c: '1.3-25' }, [
+        B('未开启 / 协议', 'page=lte4g&lteSt=off', '开通前', { st: 'tbd', c: '1.3-25' }),
+      ]),
+    ]],
+    ['固件升级（OTA）与设备自检', [
+      S('固件更新列表', 'page=ota', { st: 'code', c: '1.4-6' }),
+      S('固件升级详情与进度', 'page=otaFw&otaSt=upgrading&otaProg=60', { st: 'code', c: '1.4-6' }, [
+        B('固件下载中 42%', 'page=otaFw&otaSt=downloading&otaProg=42', '下载阶段', { st: 'code', c: '1.4-6' }),
+        B('设备重启中', 'page=otaFw&otaSt=rebooting', '生效中', { st: 'code', c: '1.4-6' }),
+        B('升级失败自动回滚', 'page=otaFw&otaRes=rollback&otaSt=rollingBack', '异常回滚', { bad: 1, st: 'code', c: '1.4-6' }),
+      ]),
+      S('设备自检 · 正常', 'page=selfcheck&ck=ok', { st: 'code', c: '1.4-5' }, [
+        B('3 项致命异常', 'page=selfcheck&ck=fatal', '异常定位', { bad: 1, st: 'code', c: '1.4-5' }),
+        B('断连待确认', 'page=selfcheck&ck=disconnect', '等待重连', { st: 'code', c: '1.4-5' }),
+        B('自检历史 · 无记录', 'page=selfcheck&scTab=history&data=empty', '0 条记录', { st: 'code', c: '1.4-5' }),
+      ]),
+    ]],
+    ['设备信息、网关配件与更换 Wi-Fi', [
+      S('设备信息（硬件与固件版本）', 'page=devInfo', { st: 'code', c: '1.4-8' }),
+      S('S3 配件管理页', 'page=gateway&via=gw', { st: 'code', c: '1.4-2' }),
+      S('更换 Wi-Fi（蓝牙重配）', 'page=devInfo&sheet=wifiChange', { st: 'code', c: '1.4-2' }, [
+        B('更换成功', 'page=prov&reWifi=1&provStep=3', '结果', { f: 2200, st: 'code', c: '1.4-2' }),
+      ]),
+    ]],
+    ['家庭共享成员与邀请', [
+      S('共享成员（主人）', 'page=share', { st: 'code', c: '1.3' }, [
+        B('无共享成员', 'page=share&data=empty', '空状态', { st: 'code', c: '1.3' }),
+        B('邀请成员弹层', 'page=share&sheet=invite', '邮箱/邀请码', { st: 'code', c: '1.3' }),
+      ]),
+      S('接受共享邀请（受邀人）', 'page=acceptInvite', { st: 'code', c: '1.3' }),
+    ]],
+  ]],
+
+  ['五、我的', [
+    ['消息中心', [
+      S('消息中心（分类推送）', 'page=messages', { st: 'code', c: '1.3-9' }, [
+        B('无消息空状态', 'page=messages&data=empty', '空状态', { st: 'code', c: '1.3-9' }),
+      ]),
+    ]],
+    ['我的与个人账号设置', [
+      S('我的', 'page=profile', { st: 'code', c: '1.4-8' }),
+      S('个人设置', 'page=account', { st: 'code', c: '1.3' }, [
+        B('编辑地址', 'page=editAddr', '地址管理', { st: 'code', c: '1.3' }),
+        B('国家 / 地区', 'page=country', '地区选择', { st: 'code', c: '1.3' }),
+      ]),
+      S('注销账号校验', 'page=deleteAccount', { bad: 1, st: 'code', c: '1.3-17' }),
+    ]],
+    ['通用设置与关于页面', [
+      S('时区选择', 'page=timezone', { st: 'code', c: '1.3' }),
+      S('帮助与反馈', 'page=helpFeedback', { st: 'code', c: '1.4-8' }),
+      S('系统权限管理', 'page=appPerms', { st: 'code', c: '1.4-8' }),
+      S('隐私说明', 'page=privacyDoc', { st: 'code', c: '1.4-8' }),
+      S('关于 T-MOW', 'page=aboutApp', { st: 'code', c: '1.4-8' }),
+    ]],
+  ]],
+];
+
+let CUR_THEME = '14';
+
+function badgeHtml() {
+  return '';
+}
+
+function buildUrl(n) {
+  const fz = n.f || 400;
+  const flatPart = document.getElementById('flat').checked ? '&frame=off' : '';
+  return `index.html#bare&freeze=${fz}&theme=${CUR_THEME}&marks=off${flatPart}&${n.hash}`;
+}
+
+function renderVisualSpec() {
+  return `<section id="fspec">
+    <h2>零、视觉设计规范</h2>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4>颜色系统</h4>
+        <div>
+          <div class="spec-sub">品牌主色与中性底色</div>
+          <div class="swatch-row">
+            <div class="swatch"><i style="background:#1E232B"></i><b>#1E232B</b><span>主色碳黑</span></div>
+            <div class="swatch"><i style="background:#F08300"></i><b>#F08300</b><span>品牌橙</span></div>
+            <div class="swatch"><i style="background:#F5F7FA"></i><b>#F5F7FA</b><span>页面底色</span></div>
+            <div class="swatch"><i style="background:#FFFFFF"></i><b>#FFFFFF</b><span>卡片白</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="spec-sub">文字与功能语义色</div>
+          <div class="swatch-row">
+            <div class="swatch"><i style="background:#14171C"></i><b>#14171C</b><span>主文字</span></div>
+            <div class="swatch"><i style="background:#5B6470"></i><b>#5B6470</b><span>次级文字</span></div>
+            <div class="swatch"><i style="background:#16794B"></i><b>#16794B</b><span>正常 / 在线</span></div>
+            <div class="swatch"><i style="background:#D92D20"></i><b>#D92D20</b><span>危险 / 故障</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <h4>字体与字阶</h4>
+        <div class="spec-sub">主字体：PingFang SC / 系统无衬线 · 数字：DIN Alternate 等宽</div>
+        <div class="type-list">
+          <div class="type-row"><span style="font-size:26px;font-weight:700;line-height:1.1">86% · 206 ㎡</span><span class="type-meta">32px Bold · 核心数据</span></div>
+          <div class="type-row"><span style="font-size:19px;font-weight:700">添加割草机</span><span class="type-meta">21px Bold · 页面大标题</span></div>
+          <div class="type-row"><span style="font-size:15px;font-weight:700">我的庭院 · 设备设置</span><span class="type-meta">16px SemiBold · 卡片标题</span></div>
+          <div class="type-row"><span style="font-size:13.5px;color:#14171C">通过蓝牙连接设备并完成配网</span><span class="type-meta">14px Regular · 正文内容</span></div>
+          <div class="type-row"><span style="font-size:12px;color:#5B6470">辅助说明、时间戳与提示文案</span><span class="type-meta">12px Regular · 辅助说明</span></div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <h4>间距系统</h4>
+        <div class="spec-sub">基于 4px 栅格体系，保持卡片呼吸感与手指操作安全距</div>
+        <div class="sp-list">
+          <div class="sp-row"><span>4px (xs)</span><span class="sp-bar" style="width:14px"></span><span>微间距</span></div>
+          <div class="sp-row"><span>8px (sm)</span><span class="sp-bar" style="width:28px"></span><span>图标与文案</span></div>
+          <div class="sp-row"><span>12px (md)</span><span class="sp-bar" style="width:48px"></span><span>列表行内距</span></div>
+          <div class="sp-row"><span>16px (lg)</span><span class="sp-bar" style="width:72px"></span><span>页面左右安全距</span></div>
+          <div class="sp-row"><span>20px (xl)</span><span class="sp-bar" style="width:96px"></span><span>卡片与弹窗内边距</span></div>
+          <div class="sp-row"><span>24px (2xl)</span><span class="sp-bar" style="width:124px"></span><span>模块区块间距</span></div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <h4>圆角规范</h4>
+        <div class="spec-sub">统一柔化工业风，避免尖锐硬角</div>
+        <div class="rad-grid">
+          <div class="rad-item"><div class="rad-box" style="border-radius:6px">6px</div><span>勾选框 / 徽标</span></div>
+          <div class="rad-item"><div class="rad-box" style="border-radius:10px">10px</div><span>输入框 / 小钮</span></div>
+          <div class="rad-item"><div class="rad-box" style="border-radius:14px">14px</div><span>主按钮 / 浮钮</span></div>
+          <div class="rad-item"><div class="rad-box" style="border-radius:16px">16px</div><span>通用内容卡片</span></div>
+          <div class="rad-item"><div class="rad-box" style="border-radius:24px">24px</div><span>弹窗 / 抽屉</span></div>
+          <div class="rad-item"><div class="rad-box" style="border-radius:999px">999px</div><span>胶囊状态标签</span></div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <h4>导航与状态标识</h4>
+        <div class="nav-demo">
+          <div class="nav-demo-top"><span>‹</span><span>页面标题</span><span style="font-size:11px;color:#5B6470;font-weight:500">操作</span></div>
+          <div style="padding:12px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:12px;color:#5B6470">
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:18px;height:18px;border-radius:5px;background:#1E232B;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px">✓</span>已完成</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:18px;height:18px;border-radius:5px;background:#FFF3E3;color:#F08300;display:inline-flex;align-items:center;justify-content:center;font-size:11px">●</span>进行中</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:18px;height:18px;border-radius:5px;background:#D92D20;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px">×</span>失败</span>
+          </div>
+          <div class="nav-demo-tab">
+            <div class="on"><span>首页</span><i></i></div>
+            <div><span>我的</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <h4>核心按钮规范</h4>
+        <div class="btn-demo-list">
+          <div class="btn-demo-main"><span class="t">主操作按钮（开始割草 / 下一步）</span><span class="w">▶</span></div>
+          <div class="btn-demo-sec">次要按钮（取消 / 跳过 / 扫码配网）</div>
+          <div class="btn-demo-dis">禁用状态（离线或条件未满足）</div>
+          <div class="btn-demo-del">危险 / 删除按钮（扁平实红 · 无渐变）</div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function renderFlow() {
+  document.getElementById('nav').innerHTML = `<a href="#fspec">零、视觉设计规范</a>`
+    + FLOW.map(([t, lanes], i) => `<a href="#f${i}">${t.split('（')[0]}</a>`
+    + (lanes.length > 1 ? lanes.map(([lt], j) => `<a class="sub" href="#f${i}-${j}">${lt.split(/[（：，]/)[0]}</a>`).join('') : '')).join('');
+
+  const branch = b => `<div class="card ${b.ls ? 'ls' : ''}">
+    <div class="frame"><iframe loading="lazy" title="${b.name}" src="${buildUrl(b)}"></iframe></div>
+    <div class="cap"><span class="n">${b.name}</span>
+    <span style="display:flex;gap:6px;align-items:center"><span class="tag ${b.bad ? 'bad' : ''}">${b.tag}</span><a href="index.html#theme=${CUR_THEME}&${b.hash}" target="_blank">打开 ↗</a></span></div></div>`;
+
+  const step = (s, no) => `<div class="col ${s.ls ? 'ls' : ''}">
+      <div class="card"><div class="frame"><iframe loading="lazy" title="${s.name}" src="${buildUrl(s)}"></iframe></div>
+      <div class="cap"><span class="no">${no}</span><span class="n">${s.name}</span><a href="index.html#theme=${CUR_THEME}&${s.hash}" target="_blank">打开 ↗</a></div></div>
+      ${s.br && s.br.length ? `<div class="br">${s.br.map(branch).join('')}</div>` : ''}</div>`;
+
+  document.getElementById('main').innerHTML = renderVisualSpec() + FLOW.map(([t, lanes], i) => `<section id="f${i}"><h2>${t}</h2>
+    ${lanes.map(([lt, steps], j) => `<div class="lane" id="f${i}-${j}"><h3>${lt}</h3><div class="row">${steps.map((s, k) => step(s, k + 1)).join('')}</div></div>`).join('')}
+  </section>`).join('');
+}
+
+document.getElementById('themeSeg').onclick = e => {
+  const b = e.target.closest('[data-t]'); if (!b) return;
+  CUR_THEME = b.dataset.t;
+  document.querySelectorAll('#themeSeg button').forEach(x => x.classList.toggle('on', x === b));
+  renderFlow();
+};
+document.getElementById('flat').onchange = e => {
+  document.body.classList.toggle('flat', e.target.checked);
+  renderFlow();
+};
+
+const navBtn = document.getElementById('navToggle');
+const setNav = off => {
+  document.body.classList.toggle('nav-off', off);
+  navBtn.textContent = off ? '»' : '«';
+  localStorage.setItem('flow14NavOff', off ? '1' : '');
+};
+setNav(localStorage.getItem('flow14NavOff') === '1');
+navBtn.onclick = () => setNav(!document.body.classList.contains('nav-off'));
+
+let CUR_ZOOM = 1;
+function setZoom(next, anchorY) {
+  const z = Math.min(3.2, Math.max(0.7, Math.round(next * 100) / 100));
+  // 锚定当前视线内最近的一张卡片，避免缩放后视野剧烈跳走
+  const refY = typeof anchorY === 'number' ? anchorY : window.innerHeight * 0.35;
+  let anchorCard = null, bestDist = Infinity, oldTop = 0;
+  document.querySelectorAll('#main .card').forEach(card => {
+    const r = card.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) return;
+    const d = Math.abs((r.top + r.bottom) / 2 - refY);
+    if (d < bestDist) { bestDist = d; anchorCard = card; oldTop = r.top; }
+  });
+
+  CUR_ZOOM = z;
+  document.documentElement.style.setProperty('--zoom', String(z));
+  document.getElementById('zoomRange').value = String(z);
+  const pct = Math.round(z * 100) + '%';
+  document.getElementById('zoomVal').textContent = pct;
+  document.getElementById('zoomFabVal').textContent = pct;
+  document.querySelectorAll('[data-z]').forEach(b => b.classList.toggle('on', Math.abs(Number(b.dataset.z) - z) < 0.01));
+  localStorage.setItem('flow14Zoom', String(z));
+
+  if (window.scrollY > 0 && anchorCard) {
+    const newTop = anchorCard.getBoundingClientRect().top;
+    window.scrollBy(0, newTop - oldTop);
+  }
+}
+
+document.getElementById('zoomRange').oninput = e => setZoom(Number(e.target.value));
+document.getElementById('zoomVal').onclick = () => setZoom(1);
+document.getElementById('zoomFabVal').onclick = () => setZoom(1);
+document.addEventListener('click', e => {
+  const stepBtn = e.target.closest('[data-zstep]');
+  if (stepBtn) return setZoom(CUR_ZOOM + Number(stepBtn.dataset.zstep));
+  const presetBtn = e.target.closest('[data-z]');
+  if (presetBtn) return setZoom(Number(presetBtn.dataset.z));
+});
+window.addEventListener('wheel', e => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  setZoom(CUR_ZOOM * factor, e.clientY);
+}, { passive: false });
+
+renderFlow();
+const savedZoom = parseFloat(localStorage.getItem('flow14Zoom') || '1.5');
+setZoom(Number.isFinite(savedZoom) ? savedZoom : 1.5);
+</script>
+</body>
+</html>

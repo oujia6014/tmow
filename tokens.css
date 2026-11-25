@@ -1,0 +1,79 @@
+/* 由 tool/export_visual_tokens.dart 生成，请勿手改。
+   源：lib/app/theme/app_theme.dart + app_visual_tokens.dart
+   重新生成：dart run tool/export_visual_tokens.dart */
+:root{
+  /* AppColors */
+  --color-primary: #3BB300;
+  --color-text-primary: #2E2E44;
+  --color-text-secondary: #999999;
+  --color-border: #E1E1E1;
+  --color-surface: #FFFFFF;
+  --color-background: #F7F7FA;
+  --color-background-top-tint: #EAF2FF;
+  --color-surface-muted: #F5F5F5;
+  --color-state-success: #009900;
+  --color-state-success-surface: #EBFBE2;
+  --color-state-danger: #D73A49;
+  --color-state-danger-surface: #FFECEE;
+  --color-state-warning: #FF9500;
+  --color-state-warning-surface: #FFF4E5;
+  --color-overlay: rgba(59,179,0,0.078);
+  --color-text-disabled: #B1B1B1;
+  --color-background-top-tint-add-device: #D9E9FF;
+  --color-mode-preview-background: #F2F4E9;
+  --color-mode-track-fill: #D7D9CF;
+  --color-mode-track-stroke: #B9BCB0;
+  --color-mode-zone-fill: #BFF07B;
+  --color-mode-glass-gradient-mid: #E5F3D4;
+  --color-bottom-tab-shell-shadow: rgba(0,0,0,0.078);
+  /* AppSpacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-section: 24px;
+  --space-section-large: 32px;
+  /* AppRadii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  /* AppControlSizes */
+  --control-compact: 40px;
+  --control-regular: 44px;
+  --control-navigation: 44px;
+  --control-minimum-tap-target: 44px;
+  /* AppLayoutSizes */
+  --layout-map-min-height: 280px;
+  /* AppIconSizes */
+  --icon-small: 16px;
+  --icon-regular: 20px;
+  --icon-large: 24px;
+  /* AppStrokeWidths */
+  --stroke-hairline: 1px;
+  --stroke-emphasized: 1.5px;
+  --stroke-progress: 2px;
+  /* AppTextStyles */
+  --font-size-caption: 10px;
+  --font-weight-caption: 400;
+  --font-size-body: 12px;
+  --font-weight-body: 400;
+  --font-size-label: 12px;
+  --font-weight-label: 600;
+  --font-size-button-large: 15px;
+  --font-weight-button-large: 600;
+  --font-size-title: 14px;
+  --font-weight-title: 600;
+  --font-size-big-label: 14px;
+  --font-weight-big-label: 400;
+  --font-size-page-title: 16px;
+  --font-weight-page-title: 600;
+  --font-size-display: 20px;
+  --font-weight-display: 700;
+  /* AppShadows */
+  --shadow-overlay: 0 var(--space-sm) var(--space-section) rgba(46,46,68,0.12);
+  /* 字体族：AppTextStyles._fontFamily */
+  --font-family: 'MiSans', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+}

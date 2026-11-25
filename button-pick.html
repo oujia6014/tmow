@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T-MOW 1.4 · Dropmow 与主按钮专项选型</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="theme-1.4.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+  body {
+    background: #DFE5EE;
+    color: #14171C;
+    font-family: var(--font-ui);
+    padding: 20px 24px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+  .review-bar {
+    max-width: 1280px;
+    margin: 0 auto 22px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 8px 24px rgba(17, 19, 23, 0.06);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .review-title h1 {
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #EEF2F7;
+    color: #14171C;
+    border: 1px solid #CFD7E2;
+    border-bottom: 2px solid #F08300;
+  }
+  .review-title p { margin-top: 4px; font-size: 12px; color: #5B6470; }
+  .review-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .ctrl-group {
+    display: flex; align-items: center; gap: 4px;
+    background: #F3F5F8; border: 1px solid #DCE2E8;
+    padding: 4px; border-radius: 10px;
+  }
+  .ctrl-group .lbl { font-size: 11px; font-weight: 600; color: #5B6470; padding: 0 6px; }
+  .ctrl-group button { font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 7px; color: #5B6470; }
+  .ctrl-group button.on { background: #1E232B; color: #FFFFFF; }
+  .back-link {
+    font-size: 12px; font-weight: 600; color: #14171C; text-decoration: none;
+    padding: 8px 12px; border-radius: 9px; background: #FFFFFF; border: 1px solid #CFD7E2;
+  }
+
+  /* 2x2 手机实机网格 */
+  .grid-2x2 {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 414px);
+    justify-content: center;
+    gap: 28px;
+  }
+  @media (max-width: 900px) {
+    .grid-2x2 { grid-template-columns: 414px; }
+  }
+  .card-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .card-meta { width: 100%; padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
+  .card-meta .name { font-size: 14px; font-weight: 700; color: #14171C; }
+  .card-meta .sub { font-size: 11.5px; color: #5B6470; }
+
+  .device-chassis {
+    background: #14161A;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow: 0 26px 56px -18px rgba(17, 19, 23, 0.34), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+  .bp-screen {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    background: #F2F5F2;
+    color: #14171C;
+    user-select: none;
+  }
+  .bp-map { position: absolute; inset: 0; }
+  .bp-map svg { width: 100%; height: 100%; display: block; }
+  .bp-top-scrim {
+    position: absolute; top: 0; left: 0; right: 0; height: 112px;
+    background: linear-gradient(180deg, rgba(242, 245, 242, .96) 0%, rgba(242, 245, 242, .72) 56%, rgba(242, 245, 242, 0) 100%);
+    pointer-events: none; z-index: 3;
+  }
+  .bp-topbar {
+    position: absolute; top: 46px; left: 16px; right: 16px; height: 42px; z-index: 8;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* 共用双栏微图表与右侧竖排条（严格对齐当前定稿） */
+  .bp-tabs {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; height: 62px;
+    background: #FFFFFF; border-top: 1px solid #EBEEF2;
+    display: flex; padding: 4px 28px 10px;
+  }
+  .bp-tabs button {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; font-size: 11px; font-weight: 500; color: #6B7480; position: relative;
+  }
+  .bp-tabs button.on { color: #14171C; font-weight: 700; }
+  .bp-tabs button.on::after {
+    content: ""; position: absolute; bottom: 0; width: 22px; height: 2px; border-radius: 2px; background: #F08300;
+  }
+  .bp-left { position: relative; z-index: 7; pointer-events: auto; display: flex; align-items: flex-end; }
+  .bp-right {
+    position: relative; z-index: 7; width: 50px; pointer-events: auto;
+    border-radius: 15px; background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px); border: 1px solid #DCE2EA;
+    box-shadow: 0 8px 20px rgba(17, 19, 23, 0.10);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .bp-right button {
+    height: 38px; color: #1E232B; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1px; font-size: 9.5px; font-weight: 700; position: relative;
+  }
+  .bp-right button + button::before {
+    content: ""; position: absolute; top: 0; left: 9px; right: 9px; height: 1px; background: #E6EBF1;
+  }
+
+  /* =========================================================
+     固定主按钮：方案 3（16° 斜切双拼机械感）
+     ========================================================= */
+  .cta-v3 {
+    flex: 1; height: 48px; border-radius: 14px;
+    background: linear-gradient(180deg, #2B303A 0%, #1B1F26 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 18px -6px rgba(17, 19, 23, 0.34);
+    color: #FFFFFF; font-size: 14.5px; font-weight: 600;
+    display: flex; align-items: stretch; overflow: hidden; position: relative;
+  }
+  .cta-v3 .wing {
+    width: 56px; background: #F08300; color: #FFFFFF;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding-right: 6px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    flex: none;
+  }
+  .cta-v3 .txt {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center;
+    padding-right: 14px; letter-spacing: 0.02em;
+  }
+
+  /* =========================================================
+     Dropmow 强按压立体感 4 套新方案（无多余文字）
+     ========================================================= */
+  .dm-btn {
+    height: 44px;
+    display: inline-flex; align-items: center;
+    font-size: 13.5px; font-weight: 700;
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .dm-btn:not(:disabled):active { transform: translateY(2px); }
+
+  /* 方案 A：16° 斜切橙翼迷你双拼（与主按钮 100% 同源设计） */
+  .dm-a {
+    padding: 0 14px 0 0; border-radius: 13px; overflow: hidden;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EDF1F6 100%);
+    border: 1px solid #C2CBD8;
+    box-shadow: 0 3px 0 #B6C0CF, 0 10px 20px rgba(17, 19, 23, 0.16), inset 0 1px 0 #FFFFFF;
+    color: #14171C; gap: 9px;
+  }
+  .dm-a .dm-wing {
+    width: 40px; height: 100%; background: linear-gradient(180deg, #F68D12 0%, #E07000 100%);
+    color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center;
+    padding-right: 5px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    flex: none;
+  }
+  .dm-a:not(:disabled):active { box-shadow: 0 1px 0 #B6C0CF, 0 4px 10px rgba(17, 19, 23, 0.14); }
+
+  /* 方案 B：脉冲橙 3D 实体立体按钮（高辨识动作按键） */
+  .dm-b {
+    padding: 0 14px 0 12px; border-radius: 13px;
+    background: linear-gradient(180deg, #F8931E 0%, #DF6F00 100%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 3.5px 0 #AD5200, 0 10px 22px -4px rgba(212, 104, 0, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    color: #FFFFFF; gap: 7px; text-shadow: 0 1px 1px rgba(130, 58, 0, 0.35);
+  }
+  .dm-b .dm-chev { opacity: .88; margin-left: 1px; }
+  .dm-b:not(:disabled):active { box-shadow: 0 1px 0 #AD5200, 0 4px 10px rgba(212, 104, 0, 0.35); }
+
+  /* 方案 C：深冷钛 3D 硬件实体键（与主按钮躯干呼应） */
+  .dm-c {
+    padding: 0 13px 0 12px; border-radius: 13px;
+    background: linear-gradient(180deg, #343A46 0%, #1E222A 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 3.5px 0 #0D1015, 0 10px 22px rgba(17, 19, 23, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    color: #FFFFFF; gap: 7px;
+  }
+  .dm-c .dm-spin { color: #F58C16; }
+  .dm-c .dm-chev { color: rgba(255, 255, 255, 0.58); margin-left: 1px; }
+  .dm-c:not(:disabled):active { box-shadow: 0 1px 0 #0D1015, 0 4px 10px rgba(17, 19, 23, 0.26); }
+
+  /* 方案 D：3D 冷银机械键帽（橙色圆角 icon 底块 + 立体灰底唇） */
+  .dm-d {
+    padding: 0 12px 0 7px; border-radius: 13px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F1F4F8 100%);
+    border: 1px solid #BFC8D6;
+    box-shadow: 0 3.5px 0 #AAB5C4, 0 10px 20px rgba(17, 19, 23, 0.16), inset 0 1.5px 0 #FFFFFF;
+    color: #14171C; gap: 8px;
+  }
+  .dm-d .dm-badge {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(180deg, #F7901A 0%, #E07000 100%);
+    color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 1px 3px rgba(224, 112, 0, 0.32);
+    flex: none;
+  }
+  .dm-d .dm-chev { color: #7B8594; margin-left: 1px; }
+  .dm-d:not(:disabled):active { box-shadow: 0 1px 0 #AAB5C4, 0 4px 10px rgba(17, 19, 23, 0.14); }
+
+  /* 禁用态（割草运行中仍保持明确实体按钮轮廓，避免发虚或混色） */
+  .dm-btn:disabled { cursor: not-allowed; opacity: .78; filter: grayscale(1); box-shadow: 0 2px 0 #BFC6D0, 0 4px 10px rgba(17, 19, 23, 0.08); }
+  .dm-b:disabled, .dm-c:disabled { background: linear-gradient(180deg, #9EA7B3 0%, #86909E 100%); color: #FFFFFF; border-color: #7E8896; box-shadow: 0 2px 0 #6C7582; text-shadow: none; }
+  .dm-c:disabled .dm-spin, .dm-c:disabled .dm-chev, .dm-b:disabled .dm-chev { color: rgba(255, 255, 255, .86); }
+
+  .proto-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1E232B; color: #FFFFFF; padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 500; box-shadow: 0 12px 30px rgba(17, 19, 23, 0.25); z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<header class="review-bar">
+  <div class="review-title">
+    <h1>Dropmow 按压质感专选 <span class="tag-pill">主按钮已定稿：16° 斜切橙翼</span></h1>
+    <p>底部主按钮全部固定为已选中的「16° 斜切双拼机械感」，只对比左下角 Dropmow 的 4 种实体按键质感（无多余文字）。</p>
+  </div>
+  <div class="review-controls">
+    <div class="ctrl-group" id="stCtrl">
+      <span class="lbl">切换场景</span>
+      <button class="on" data-st="idle">待机充电（开始割草）</button>
+      <button data-st="mowing">割草运行中（暂停 + 回桩）</button>
+    </div>
+    <a class="back-link" href="index.html">← 返回 1.4 原型</a>
+  </div>
+</header>
+
+<main class="grid-2x2" id="grid"></main>
+
+<script>
+const IMG = 'assets/';
+const ICO = {
+  down: '<path d="m6 9 6 6 6-6"/>',
+  chev: '<path d="m9 6 6 6-6 6"/>',
+  play: '<path d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7z" fill="currentColor" stroke="none"/>',
+  pause: '<rect x="6.5" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/>',
+  home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5.5h-6V20H5a1 1 0 0 1-1-1z"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/>',
+  msg: '<path d="M5 5h14a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h7"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  map: '<path d="M3 6.5 8.5 4l7 2.5L21 4v13.5L15.5 20l-7-2.5L3 20z"/><path d="M8.5 4v13.5M15.5 6.5V20"/>',
+  pad: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="13.8" r=".7" fill="currentColor"/>',
+  dock: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  locate: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
+  area: '<path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/><path d="M4 7.5 12 11l8-3.5M12 11v9"/>',
+  wifi: '<path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0"/><circle cx="12" cy="19.2" r="1" fill="currentColor" stroke="none"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+  records: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  blade: '<circle cx="12" cy="12" r="2"/><path d="M12 10c0-3 1.5-5.5 4-6.5M14 12c3 0 5.5 1.5 6.5 4M12 14c0 3-1.5 5.5-4 6.5M10 12c-3 0-5.5-1.5-6.5-4"/>',
+  dropmow: '<g><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(120 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g><g transform="rotate(240 12 12)"><path d="M7.9 4.9A8.2 8.2 0 0 1 18.7 7.3" stroke-width="2.2" stroke-linecap="butt"/><path d="M20.6 6L20 10L16.8 8.6Z" fill="currentColor" stroke="none"/></g>',
+};
+const ic = (n, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24">${ICO[n]}</svg>`;
+function sigBars(n = 4) {
+  return `<svg class="ico sm" style="width:13px;height:13px" viewBox="0 0 24 24">${[0,1,2,3].map(i =>
+    `<rect x="${3 + i*5}" y="${16 - i*3.5}" width="3" height="${4 + i*3.5}" rx="1" fill="${i < n ? 'currentColor' : 'none'}" stroke="${i < n ? 'none' : 'currentColor'}" stroke-width="1.3" opacity="${i < n ? 1 : .35}"/>`).join('')}</svg>`;
+}
+function statusbar() {
+  return `<div class="sb"><span>9:41</span><span class="sb-icons">${sigBars(4)}${ic('wifi', 'sm')}<svg class="ico sm" viewBox="0 0 24 24" style="width:22px"><rect x="2" y="7" width="18" height="10" rx="2.5"/><path d="M22 10.5v3"/><rect x="4" y="9" width="13" height="6" rx="1" fill="currentColor" stroke="none"/></svg></span></div>`;
+}
+
+let ST = 'idle';
+
+function renderMap(uid) {
+  const Z1 = 'M26 168 C 92 142, 248 130, 362 142 C 378 182, 382 242, 374 282 C 296 292, 120 292, 28 290 C 16 254, 16 206, 26 168Z';
+  const Z2 = 'M28 408 C 120 406, 228 406, 296 408 C 336 408, 366 412, 378 420 C 386 468, 384 516, 372 560 C 276 574, 120 576, 36 564 C 20 516, 18 456, 28 408Z';
+  const Z3 = 'M308 302 C 336 298, 360 298, 376 304 C 382 338, 382 368, 376 398 C 354 402, 330 402, 308 398 C 302 368, 302 328, 308 302Z';
+  const mowing = ST === 'mowing';
+  let dots = '';
+  const step = 8.2, tile = step * 6;
+  for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) {
+    let h = (c * 73856093 ^ r * 19349663) >>> 0; h = ((h ^ (h >>> 13)) * 1274126177) >>> 0;
+    if (h % 3) continue;
+    const x = (c + .5) * step + ((h % 7) - 3) * step * .12, y = (r + .5) * step + (((h / 7 | 0) % 5) - 2) * step * .12, rr = 1.6 * (.65 + (h % 4) * .12);
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr.toFixed(2)}" fill="${h % 2 ? '#9DBF95' : '#FFFFFF'}" opacity="${h % 2 ? 0.14 : 0.28}"/>`;
+  }
+  const pts = [];
+  for (let i = 0; i <= 9; i++) { const y = 148 + i * 10, a = `14 ${y}`, b = `388 ${y - 6}`; pts.push(...(i % 2 ? [b, a] : [a, b])); }
+  const zone = d => `<path d="${d}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/><path d="${d}" fill="#DDEDD9"/><path d="${d}" fill="url(#g_${uid})"/><path d="${d}" fill="none" stroke="#5E8F55" stroke-width="1.2" stroke-dasharray="2.5 2.5"/>`;
+  const robotPos = mowing ? [302, 232] : [76, 348];
+  return `
+  <svg viewBox="-12 40 422 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <clipPath id="cz_${uid}"><path d="${Z1}"/></clipPath>
+      <pattern id="g_${uid}" width="${tile}" height="${tile}" patternUnits="userSpaceOnUse">${dots}</pattern>
+      <pattern id="d_${uid}" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="0.95" fill="#B9C3B8" fill-opacity="0.45"/></pattern>
+    </defs>
+    <rect x="-80" y="-80" width="560" height="1000" fill="#F2F5F2"/>
+    <rect x="-80" y="-80" width="560" height="1000" fill="url(#d_${uid})"/>
+    <path d="M74 286 L74 412" fill="none" stroke="#D8DBD0" stroke-opacity="0.82" stroke-width="20" stroke-linecap="round"/>
+    <path d="M74 286 L74 412" fill="none" stroke="#A9B09E" stroke-width="2.2" stroke-dasharray="5.5 6.5" stroke-linecap="round"/>
+    ${zone(Z1)}${zone(Z2)}${zone(Z3)}
+    ${mowing ? `<g clip-path="url(#cz_${uid})"><polyline points="${pts.join(' ')}" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : ''}
+    <g font-family="var(--font-ui)" text-anchor="middle">
+      <text x="196" y="218" font-size="14" font-weight="700" fill="#325330">区域 1</text>
+      <text x="200" y="486" font-size="14" font-weight="700" fill="#325330">区域 2</text>
+      <text x="342" y="352" font-size="12" font-weight="700" fill="#325330">侧院</text>
+    </g>
+    <g transform="translate(124 348)"><rect x="-13" y="-13" width="26" height="26" rx="7" fill="#FFFFFF" stroke="#5E8F55" stroke-opacity="0.35" stroke-width="1.2"/><image href="${IMG}device/icon_device_charge_station.png" x="-11" y="-11" width="22" height="22"/></g>
+    <g transform="translate(${robotPos[0]} ${robotPos[1]}) rotate(${mowing ? 78 : 0})"><circle r="21" fill="#FFFFFF" fill-opacity="0.88"/><image href="${IMG}device/device_selfcheck_product.png" x="-14" y="-19" width="28" height="38"/></g>
+  </svg>`;
+}
+
+function renderVariant(v) {
+  const mowing = ST === 'mowing';
+  const bat = mowing ? 74 : 86;
+  const dmHtml = {
+    1: `<button class="dm-btn dm-a" ${mowing ? 'disabled' : ''} data-act="toast" data-msg="方案 A · 斜切橙翼 Dropmow"><span class="dm-wing">${ic('dropmow', 'sm')}</span><span>Dropmow</span></button>`,
+    2: `<button class="dm-btn dm-b" ${mowing ? 'disabled' : ''} data-act="toast" data-msg="方案 B · 脉冲橙实体 Dropmow">${ic('dropmow', 'sm')}<span>Dropmow</span><span class="dm-chev">${ic('chev', 'sm')}</span></button>`,
+    3: `<button class="dm-btn dm-c" ${mowing ? 'disabled' : ''} data-act="toast" data-msg="方案 C · 深冷钛机械 Dropmow"><span class="dm-spin">${ic('dropmow', 'sm')}</span><span>Dropmow</span><span class="dm-chev">${ic('chev', 'sm')}</span></button>`,
+    4: `<button class="dm-btn dm-d" ${mowing ? 'disabled' : ''} data-act="toast" data-msg="方案 D · 3D 白瓷键帽 Dropmow"><span class="dm-badge">${ic('dropmow', 'sm')}</span><span>Dropmow</span><span class="dm-chev">${ic('chev', 'sm')}</span></button>`,
+  }[v.id];
+
+  const ctaHtml = mowing
+    ? `<button class="cta-v3" data-act="toast" data-msg="暂停作业"><span class="wing">${ic('pause', 'sm')}</span><span class="txt">暂停作业</span></button><button class="v1-btn-sq">${ic('dock')}</button>`
+    : `<button class="cta-v3" data-act="setSt" data-st="mowing"><span class="wing">${ic('play', 'sm')}</span><span class="txt">开始割草</span></button>`;
+
+  return `
+  <div class="bp-screen">
+    ${statusbar()}
+    <div class="bp-map">${renderMap('V' + v.id)}</div>
+    <div class="bp-top-scrim"></div>
+
+    <div class="bp-topbar">
+      <button class="v3-brandpill">
+        <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+        <span class="sep"></span>
+        <span class="name"><span class="status-dot ok"></span>后院割草机 ${ic('down', 'sm')}</span>
+      </button>
+      <div class="v3-fab-pair">
+        <button class="v3-sq-fab">${ic('area', 'sm')}</button>
+        <button class="v3-sq-fab">${ic('msg', 'sm')}<span class="dot"></span></button>
+        <button class="v3-sq-fab">${ic('gear', 'sm')}</button>
+      </div>
+    </div>
+
+    <div class="hp-bottom-dock">
+      <div class="hp-map-controls">
+        <div class="bp-left">${dmHtml}</div>
+
+        <div class="bp-right">
+          <button class="num">${ic('blade', 'sm')}<span>50mm</span></button>
+          <button>${ic('map', 'sm')}<span>地图</span></button>
+          <button>${ic('pad', 'sm')}<span>遥控</span></button>
+          <button>${ic('locate', 'sm')}<span>定位</span></button>
+        </div>
+      </div>
+
+      <section class="v3-panel">
+        <div class="v3-tele-bar">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span class="status-dot ok"></span>
+            <strong style="font-size:15px">${mowing ? '正在割草' : '正在充电'}</strong>
+            <span style="font-size:11.5px;color:#5B6470">· 我的庭院</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="hp-sig-chip">${sigBars(4)}<span>Wi-Fi</span></span>
+            <span class="hp-bat-pill"><svg viewBox="0 0 24 14" fill="none"><rect x="1" y="1.5" width="19" height="11" rx="2.5" stroke="#8C96A4" stroke-width="1.3"/><path d="M21.5 5v4" stroke="#8C96A4" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="3.5" width="${(bat*0.14).toFixed(1)}" height="7" rx="1.2" fill="#199459"/>${!mowing ? `<path d="M11.2 2.5L8.4 7.3h2.3l-.9 4.2 3.8-5.1h-2.4z" fill="#FFFFFF" stroke="#16794B" stroke-width="0.6"/>` : ''}</svg><span class="num" style="font-size:18px;font-weight:700">${bat}<small style="font-size:11px;color:#5B6470">%</small></span></span>
+          </div>
+        </div>
+        <div class="v3-body">
+          ${mowing ? `
+            <div class="hp-mow-box">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                <span style="color:#325330;font-weight:600">区域 1 · 已完成 45% · 剩余 38 分</span>
+                <strong class="num">76 / 170 ㎡</strong>
+              </div>
+              <div class="hp-mow-bar"><i style="width:45%"></i></div>
+            </div>` : `
+            <div class="v3-two-cols">
+              <button class="v3-stat-box tone-green">
+                <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 14L40 8M8 24L42 18M6 34L40 28M10 42L36 38"/></svg>
+                <div class="stat-top"><span class="stat-ico">${ic('records', 'sm')}</span><span class="k">上次割草</span><span class="stat-pill ok">完成</span><span class="stat-arr">›</span></div>
+                <div class="v num">周二 · 170 ㎡</div>
+                <div class="stat-foot"><span class="stat-mini-bar"><i style="width:100%"></i></span><span class="stat-foot-txt">${ic('clock', 'sm')}1小时12分</span></div>
+              </button>
+              <button class="v3-stat-box tone-amber">
+                <svg class="stat-wm" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="26" cy="26" r="17" stroke-dasharray="3 4"/><path d="M26 16v10l7 4"/></svg>
+                <div class="stat-top"><span class="stat-ico">${ic('cal', 'sm')}</span><span class="k">下次定时</span><span class="stat-arr">›</span></div>
+                <div class="v num">周三 07:30</div>
+                <div class="stat-foot"><div class="stat-days"><i class="on">一</i><i>二</i><i class="on">三</i><i>四</i><i class="on">五</i><i>六</i><i>日</i></div></div>
+              </button>
+            </div>`}
+          <div class="v3-actions">${ctaHtml}</div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="bp-tabs"><button class="on">${ic('home')}<span>首页</span></button><button>${ic('user')}<span>我的</span></button></nav>
+  </div>`;
+}
+
+function renderAll() {
+  const variants = [
+    { id: 1, name: '方案 A · 16° 斜切橙翼迷你双拼', sub: '与底部主按钮同源斜切橙翼 + 3D 按键灰底唇，家族感最强' },
+    { id: 2, name: '方案 B · 脉冲橙 3D 实体按键', sub: '高反差脉冲橙立体按钮 + 深橙实底唇 + 箭头，在草坪上最抢眼好按' },
+    { id: 3, name: '方案 C · 深冷钛 3D 硬件实体键', sub: '深冷钛按压实体键 + 橙旋标，呼应主按钮深色躯干与硬件感' },
+    { id: 4, name: '方案 D · 3D 白瓷机械键帽', sub: '白瓷面 + 橙色方圆角 icon 底座 + 3.5px 实体灰底唇，轻盈又有按压厚度' },
+  ];
+  document.getElementById('grid').innerHTML = variants.map(v => `
+    <section class="card-col">
+      <div class="card-meta"><span class="name">${v.name}</span><span class="sub">${v.sub}</span></div>
+      <div class="device-chassis">${renderVariant(v)}</div>
+    </section>
+  `).join('');
+  document.querySelectorAll('#stCtrl button').forEach(b => b.classList.toggle('on', b.dataset.st === ST));
+}
+
+let tt = null;
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-st],[data-act]');
+  if (!b) return;
+  if (b.dataset.st || b.dataset.act === 'setSt') { ST = b.dataset.st || 'mowing'; return renderAll(); }
+  if (b.dataset.act === 'toast') {
+    document.querySelector('.proto-toast')?.remove(); clearTimeout(tt);
+    const el = document.createElement('div'); el.className = 'proto-toast'; el.textContent = b.dataset.msg;
+    document.body.appendChild(el); tt = setTimeout(() => el.remove(), 1800);
+  }
+});
+
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,1748 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T-MOW 1.4 首页智控台 · 去竞品化全浅色三方案对比</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="theme-1.4.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #DDE3EC;
+    color: #14171C;
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    padding: 24px 24px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; border: none; background: none; color: inherit; }
+
+  /* ---------- 顶部评审控制条 ---------- */
+  .review-bar {
+    max-width: 1420px;
+    margin: 0 auto 22px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+    border-radius: 16px;
+    padding: 15px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 16px rgba(17, 19, 23, 0.05);
+  }
+  .review-title h1 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #EEF2F7;
+    color: #14171C;
+    border: 1px solid #CFD7E2;
+    border-bottom: 2px solid #F08300;
+  }
+  .review-title p {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #5B6470;
+  }
+  .review-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #F3F5F8;
+    border: 1px solid #DCE2E8;
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .ctrl-group .lbl {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5B6470;
+    padding: 0 6px;
+  }
+  .ctrl-group button {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 11px;
+    border-radius: 7px;
+    color: #5B6470;
+    cursor: pointer;
+    transition: all 0.14s;
+  }
+  .ctrl-group button:hover { color: #14171C; }
+  .ctrl-group button.on { background: #1E232B; color: #FFFFFF; }
+  .back-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: #14171C;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 9px;
+    background: #FFFFFF;
+    border: 1px solid #CFD7E2;
+  }
+  .back-link:hover { background: #F3F5F8; }
+
+  /* ---------- 三方案并排网格 ---------- */
+  .variants-grid {
+    max-width: 1420px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 414px);
+    justify-content: center;
+    gap: 28px;
+  }
+  @media (max-width: 1360px) {
+    .variants-grid { grid-template-columns: repeat(2, 414px); }
+  }
+  @media (max-width: 900px) {
+    .variants-grid { grid-template-columns: 414px; }
+  }
+  .variant-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .variant-meta {
+    width: 100%;
+    min-height: 22px;
+    padding: 0 6px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .variant-meta .name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #14171C;
+  }
+  .variant-meta .sub {
+    font-size: 11px;
+    color: #5B6470;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .device-chassis {
+    background: #14161A;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 26px 56px -18px rgba(17, 19, 23, 0.34),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  /* =========================================================
+     公共手机画幅 & 浅色通用底栏
+     ========================================================= */
+  .hv-screen {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    background: #EEF1F5;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    user-select: none;
+  }
+  .hv-light-tabs {
+    height: 62px;
+    background: #FFFFFF;
+    border-top: 1px solid #E7ECF2;
+    display: flex;
+    padding: 4px 28px 10px;
+    flex: none;
+    position: relative;
+    z-index: 9;
+  }
+  .hv-light-tabs.abs {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  .hv-light-tabs button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6B7480;
+    position: relative;
+    cursor: pointer;
+  }
+  .hv-light-tabs button.on {
+    color: #14171C;
+    font-weight: 700;
+  }
+  .hv-light-tabs button.on::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: #F08300;
+  }
+
+  /* 公共轻量状态/信号组件 */
+  .hv-sig-chip {
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    color: #2B333E;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(17, 19, 23, 0.04);
+  }
+  .hv-sig-chip:hover { border-color: #B8C2CC; }
+  .hv-mow-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #E2ECE4;
+    overflow: hidden;
+  }
+  .hv-mow-bar i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1E8E57 0%, #2CB571 100%);
+  }
+
+  /* =========================================================
+     新方案 1：X5 银翼展厅 · 实机 + 画中图（强化品牌与实机质感）
+     ========================================================= */
+  .s1-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #E8EDF3 0%, #F4F6F9 44%, #ECEFF4 100%);
+  }
+  .s1-topbar {
+    margin-top: 46px;
+    height: 44px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: none;
+  }
+  .s1-brand-select {
+    height: 36px;
+    padding: 0 11px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #DCE2EA;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .s1-brand-select img.logo { height: 12px; width: auto; display: block; }
+  .s1-brand-select .sep { width: 1px; height: 12px; background: #D2D9E2; }
+  .s1-brand-select .dev {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #14171C;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  /* 一体式分段胶囊：消除竞品右上双孤圆按钮 */
+  .s1-seg-actions {
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #DCE2EA;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .s1-seg-actions button {
+    width: 38px;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E232B;
+    position: relative;
+    cursor: pointer;
+  }
+  .s1-seg-actions button:hover { background: #F1F4F8; }
+  .s1-seg-actions .vsep { width: 1px; height: 16px; background: #E1E6EE; }
+  .s1-seg-actions .dot {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--state-danger);
+    border: 1.5px solid #FFFFFF;
+  }
+
+  /* 展台核心区 */
+  .s1-showroom {
+    margin: 6px 16px 0;
+    border-radius: 22px;
+    background: radial-gradient(ellipse 92% 72% at 50% 54%, #FFFFFF 0%, #F3F6FA 62%, #E7ECF3 100%);
+    border: 1px solid #DDE3EC;
+    padding: 14px 16px 12px;
+    position: relative;
+    overflow: hidden;
+    flex: none;
+  }
+  /* 呼应 T-MOW LOGO 16° 斜切柔光带 */
+  .s1-slash-glow {
+    position: absolute;
+    right: -28px;
+    top: -12px;
+    width: 140px;
+    height: 290px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.15) 100%);
+    transform: skewX(-16deg);
+    pointer-events: none;
+  }
+  .s1-hero-head {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .s1-status-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #14171C;
+  }
+  .s1-status-sub {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #5B6470;
+  }
+  .s1-bat-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex: none;
+  }
+  .s1-bat-num {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    line-height: 1;
+  }
+  .s1-bat-num b { font-size: 27px; font-weight: 700; color: #14171C; }
+  .s1-bat-num span { font-size: 12px; font-weight: 600; color: #5B6470; }
+  .s1-mower-stage {
+    position: relative;
+    z-index: 2;
+    margin-top: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .s1-mower-stage img {
+    width: 236px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 12px 18px rgba(17, 19, 23, 0.18));
+  }
+  .s1-mower-stage .shadow {
+    width: 184px;
+    height: 13px;
+    margin-top: -21px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(17, 19, 23, 0.24) 0%, rgba(17, 19, 23, 0.06) 56%, transparent 80%);
+  }
+  .s1-energy-rail {
+    margin-top: 8px;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .s1-energy-rail .track {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: #DDE3EC;
+    overflow: hidden;
+    position: relative;
+  }
+  .s1-energy-rail .fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1F8D57 0%, #2FC17A 92%, #F08300 100%);
+  }
+
+  /* 宽幅庭院画中图 */
+  .s1-map-card {
+    margin: 10px 16px 0;
+    height: 146px;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    padding: 5px;
+    position: relative;
+    overflow: hidden;
+    flex: none;
+  }
+  .s1-map-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #EAEFEA;
+    position: relative;
+  }
+  .s1-map-inner svg { width: 100%; height: 100%; display: block; }
+  .s1-expand-pill {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    height: 23px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #D7E0DA;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #14171C;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(17, 19, 23, 0.08);
+  }
+  .s1-map-badge {
+    position: absolute;
+    left: 7px;
+    top: 7px;
+    height: 23px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(45, 115, 72, 0.14);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #29563B;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* 方案 1 割草中/展开态：紧凑实机条 + 大画幅地图卡 */
+  .s1-compact-strip {
+    margin: 6px 16px 0;
+    padding: 10px 14px;
+    border-radius: 18px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+  }
+  .s1-compact-strip .thumb {
+    width: 58px;
+    height: 44px;
+    border-radius: 12px;
+    background: #F1F4F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .s1-compact-strip .thumb img { width: 50px; height: auto; }
+  .s1-bigmap-card {
+    margin: 10px 16px 0;
+    flex: 1;
+    min-height: 0;
+    border-radius: 22px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .s1-bigmap-view {
+    flex: 1;
+    min-height: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #EAEFEA;
+    position: relative;
+  }
+  .s1-bigmap-view svg { width: 100%; height: 100%; display: block; }
+  .s1-bigmap-prog {
+    padding: 6px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: none;
+  }
+
+  /* 方案 1 一主两副按键坞 + 3 格仪表卡 */
+  .s1-dock-row {
+    margin: 10px 16px 0;
+    display: flex;
+    gap: 8px;
+    flex: none;
+  }
+  .s1-cta-main {
+    flex: 1.55;
+    height: 50px;
+    border-radius: 14px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .s1-cta-main::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 11px;
+    bottom: 11px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: #F08300;
+  }
+  .s1-cta-sub {
+    flex: 1;
+    height: 50px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    border: 1px solid #D9E0E8;
+    color: #14171C;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .s1-cta-sub:hover { background: #F5F7FA; }
+  .s1-metrics-row {
+    margin: 10px 16px 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex: none;
+  }
+  .s1-metric-box {
+    background: #FFFFFF;
+    border: 1px solid #E1E6EE;
+    border-radius: 13px;
+    padding: 9px 10px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .s1-metric-box .k { font-size: 10.5px; font-weight: 600; color: #6B7480; }
+  .s1-metric-box .v { margin-top: 2px; font-size: 13px; font-weight: 700; color: #14171C; white-space: nowrap; }
+
+  /* =========================================================
+     新方案 2：庭院 Bento 仪表板 · 画框式地图（彻底告别右侧立柱）
+     ========================================================= */
+  .s2-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: #ECEFF4;
+  }
+  .s2-topbar {
+    margin-top: 46px;
+    height: 46px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: none;
+  }
+  .s2-dev-avatar {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+  }
+  .s2-dev-avatar .ava-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .s2-dev-avatar .ava-box img { width: 32px; height: auto; }
+  .s2-dev-avatar .t1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #14171C;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.15;
+  }
+  .s2-dev-avatar .t2 {
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5B6470;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  /* 极简无框纯线性图标组 */
+  .s2-plain-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .s2-plain-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E232B;
+    position: relative;
+    cursor: pointer;
+  }
+  .s2-plain-btn:hover { background: rgba(20, 23, 28, 0.05); }
+  .s2-plain-btn .dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--state-danger);
+    border: 1.5px solid #ECEFF4;
+  }
+
+  /* Card 1: 瓷白核心遥测卡 + 环形电量表盘 */
+  .s2-tele-card {
+    margin: 6px 16px 0;
+    padding: 14px 16px;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex: none;
+  }
+  .s2-tele-left { flex: 1; min-width: 0; }
+  .s2-tele-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #14171C;
+  }
+  .s2-tele-sub {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #5B6470;
+  }
+  .s2-mini-chips {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .s2-mini-chip {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #F4F6F9;
+    border: 1px solid #E6EBF1;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2B333E;
+    cursor: pointer;
+  }
+  .s2-ring-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+  }
+  .s2-ring-wrap {
+    position: relative;
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s2-ring-wrap svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .s2-ring-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #14171C;
+    line-height: 1;
+  }
+  .s2-ring-val small { font-size: 10px; color: #5B6470; font-weight: 600; }
+
+  /* Card 2: 画框式地图卡 + 内嵌底部三格毛玻璃工具条 */
+  .s2-map-frame {
+    margin: 10px 16px 0;
+    flex: 1;
+    min-height: 0;
+    border-radius: 22px;
+    background: #FFFFFF;
+    border: 1px solid #DCE2EA;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .s2-map-viewport {
+    flex: 1;
+    min-height: 0;
+    border-radius: 17px;
+    background: #EAEFEA;
+    overflow: hidden;
+    position: relative;
+  }
+  .s2-map-viewport svg { width: 100%; height: 100%; display: block; }
+  .s2-map-topchip {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.90);
+    border: 1px solid rgba(45, 115, 72, 0.16);
+    font-size: 11px;
+    font-weight: 700;
+    color: #1F4D32;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .s2-map-bottom-bar {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 6px 18px rgba(17, 19, 23, 0.08);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: hidden;
+  }
+  .s2-map-bottom-bar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E232B;
+    cursor: pointer;
+    position: relative;
+  }
+  .s2-map-bottom-bar button + button::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 1px;
+    background: #E1E6EE;
+  }
+  .s2-map-bottom-bar button:hover { background: rgba(240, 244, 248, 0.8); }
+
+  /* Card 3: 对称双控操作栏 */
+  .s2-action-pair {
+    margin: 10px 16px 12px;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 10px;
+    flex: none;
+  }
+  .s2-btn-primary {
+    height: 48px;
+    border-radius: 14px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .s2-btn-primary::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: #F08300;
+  }
+  .s2-btn-secondary {
+    height: 48px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    border: 1px solid #D3DBE5;
+    color: #14171C;
+    font-size: 13.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  /* =========================================================
+     新方案 3：无界轻银地图 + 双轨悬浮控制岛 + 胶囊底栏
+     ========================================================= */
+  .s3-screen { background: #EAEFEA; }
+  .s3-map-full {
+    position: absolute;
+    inset: 0;
+  }
+  .s3-map-full svg { width: 100%; height: 100%; display: block; }
+  .s3-top-fade {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 110px;
+    background: linear-gradient(180deg, rgba(234, 239, 234, 0.88) 0%, rgba(234, 239, 234, 0) 100%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .s3-bottom-fade {
+    position: absolute;
+    left: 0; right: 0; bottom: 0; height: 220px;
+    background: linear-gradient(180deg, rgba(234, 239, 234, 0) 0%, rgba(238, 241, 245, 0.82) 48%, rgba(238, 241, 245, 0.98) 100%);
+    pointer-events: none;
+    z-index: 4;
+  }
+  /* 全宽毛玻璃钛银一体顶栏 */
+  .s3-glass-topbar {
+    position: absolute;
+    top: 46px;
+    left: 14px;
+    right: 14px;
+    height: 42px;
+    z-index: 8;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    box-shadow: 0 6px 20px rgba(17, 19, 23, 0.08);
+    padding: 0 8px 0 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .s3-top-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    cursor: pointer;
+  }
+  .s3-top-left img.logo { height: 11px; width: auto; flex: none; }
+  .s3-top-left .sep { width: 1px; height: 11px; background: #CFD7E2; flex: none; }
+  .s3-top-left .name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #14171C;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+  .s3-top-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: none;
+  }
+  .s3-inline-bat {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #16794B;
+    background: #E8F6EE;
+    padding: 3px 6px;
+    border-radius: 7px;
+  }
+  .s3-inline-wifi {
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 7px;
+    background: #F2F5F9;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #2B333E;
+    cursor: pointer;
+  }
+  .s3-top-ico {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E232B;
+    position: relative;
+    cursor: pointer;
+  }
+  .s3-top-ico:hover { background: #F1F4F8; }
+  .s3-top-ico .dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+    background: var(--state-danger);
+    border: 1.5px solid #FFFFFF;
+  }
+
+  /* 底部双轨轻银悬浮控制岛（右侧地图保持 100% 清空） */
+  .s3-island {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 80px;
+    z-index: 9;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 32px rgba(17, 19, 23, 0.11);
+    overflow: hidden;
+  }
+  .s3-upper-rail {
+    height: 38px;
+    background: #F3F6FA;
+    border-bottom: 1px solid #E6ECF2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .s3-upper-rail button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2B333E;
+    cursor: pointer;
+    position: relative;
+  }
+  .s3-upper-rail button + button::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 1px;
+    background: #E1E7EF;
+  }
+  .s3-upper-rail button:hover { background: #EAEFF5; }
+
+  .s3-lower-split {
+    padding: 14px 15px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .s3-left-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .s3-slant-mark {
+    width: 3px;
+    height: 18px;
+    margin-top: 3px;
+    border-radius: 1.5px;
+    background: #F08300;
+    transform: skewX(-16deg);
+    flex: none;
+  }
+  .s3-status-h {
+    font-size: 17.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #14171C;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .s3-status-p {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: #5B6470;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .s3-right-cta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex: none;
+  }
+  .s3-compact-start {
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 13px;
+    background: #1E232B;
+    color: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(20, 23, 28, 0.16);
+  }
+  .s3-compact-sq {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: #F2F5F9;
+    border: 1px solid #DCE2EA;
+    color: #14171C;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* 方案 3 悬浮浅瓷白胶囊底栏 */
+  .s3-float-pill {
+    position: absolute;
+    left: 96px;
+    right: 96px;
+    bottom: 16px;
+    height: 50px;
+    z-index: 9;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 24px rgba(17, 19, 23, 0.12);
+    display: flex;
+    padding: 4px 10px;
+  }
+  .s3-float-pill button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #6B7480;
+    position: relative;
+    cursor: pointer;
+  }
+  .s3-float-pill button.on { color: #14171C; font-weight: 700; }
+  .s3-float-pill button.on::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: #F08300;
+  }
+
+  .proto-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1E232B;
+    color: #FFFFFF;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 12px 30px rgba(17, 19, 23, 0.25);
+    border-bottom: 2px solid #F08300;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<header class="review-bar">
+  <div class="review-title">
+    <h1>T-MOW 1.4 首页智控台 · 去竞品化浅色重构 <span class="tag-pill">3 方案对比</span></h1>
+    <p>全浅色冷钛银与瓷白体系 · 零大片黑色 · 彻底告别竞品右侧竖排悬浮钮与底部通栏大按钮模板。</p>
+  </div>
+  <div class="review-controls">
+    <div class="ctrl-group" id="stateCtrl">
+      <span class="lbl">设备状态</span>
+      <button class="on" data-st="idle">待机充电</button>
+      <button data-st="mowing">割草中（103 进度）</button>
+      <button data-st="blocked">bit7 阻挡弹窗</button>
+    </div>
+    <a class="back-link" href="visual-preview.html">← 返回 4 屏总览</a>
+  </div>
+</header>
+
+<main class="variants-grid" id="grid"></main>
+
+<script>
+const IMG = 'assets/';
+const ICO = {
+  down: '<path d="m6 9 6 6 6-6"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  play: '<path d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7z" fill="currentColor" stroke="none"/>',
+  pause: '<rect x="6.5" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/>',
+  home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5.5h-6V20H5a1 1 0 0 1-1-1z"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/>',
+  msg: '<path d="M5 5h14a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h7"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  map: '<path d="M3 6.5 8.5 4l7 2.5L21 4v13.5L15.5 20l-7-2.5L3 20z"/><path d="M8.5 4v13.5M15.5 6.5V20"/>',
+  pad: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="13.8" r=".7" fill="currentColor"/>',
+  dock: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  locate: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
+  alert: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/>',
+  wifi: '<path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0"/><circle cx="12" cy="19.2" r="1" fill="currentColor" stroke="none"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+  blade: '<circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2"/><path d="M12 4.5v3M12 16.5v3M4.5 12h3M16.5 12h3"/>',
+  back: '<path d="m15 6-6 6 6 6"/>',
+  expand: '<path d="M14 5h5v5M19 5l-6.5 6.5M10 19H5v-5M5 19l6.5-6.5"/>',
+};
+const ic = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24">${ICO[name]}</svg>`;
+function sigBars(n = 4) {
+  return `<svg class="ico sm" style="width:13px;height:13px" viewBox="0 0 24 24">${[0,1,2,3].map(i =>
+    `<rect x="${3 + i*5}" y="${16 - i*3.5}" width="3" height="${4 + i*3.5}" rx="1" fill="${i < n ? 'currentColor' : 'none'}" stroke="${i < n ? 'none' : 'currentColor'}" stroke-width="1.3" opacity="${i < n ? 1 : .35}"/>`).join('')}</svg>`;
+}
+function statusbar() {
+  return `<div class="sb"><span>9:41</span><span class="sb-icons">${sigBars(4)}${ic('wifi', 'sm')}<svg class="ico sm" viewBox="0 0 24 24" style="width:22px"><rect x="2" y="7" width="18" height="10" rx="2.5"/><path d="M22 10.5v3"/><rect x="4" y="9" width="13" height="6" rx="1" fill="currentColor" stroke="none"/></svg></span></div>`;
+}
+
+const APP = {
+  st: 'idle',        // idle | mowing | blocked
+  s1Expanded: false, // 方案 1 待机态是否展开全图
+  modal: null,       // null | { target:'S1'|'S2'|'S3', kind:'signal'|'dock' }
+  dockClear: true,
+  dockAuto: false,
+};
+
+function getStateMeta() {
+  return {
+    idle:    { dot: 'ok',  title: '正在充电', sub: '电量已满 · 可随时出发', bat: '86' },
+    mowing:  { dot: 'ok',  title: '正在割草', sub: '区域 1 · 已完成 45% · 剩余 38 分', bat: '74' },
+    blocked: { dot: 'bad', title: '区域阻挡', sub: '区域 1 路径受阻 · 待处理', bat: '71' },
+  }[APP.st];
+}
+
+/* ---------- 1. 横版庭院画中图（专配方案 1 待机态 360x150 比例，顶部留白避开角标） ---------- */
+function renderWideMapPreview(uid) {
+  const Z1 = 'M18 39 C 62 31, 118 33, 150 40 C 160 66, 158 104, 148 130 C 102 137, 46 135, 18 126 C 12 96, 12 67, 18 39Z';
+  const Z2 = 'M216 38 C 264 33, 314 35, 342 42 C 348 68, 346 106, 338 130 C 296 137, 248 135, 218 126 C 210 98, 210 66, 216 38Z';
+  return `
+  <svg viewBox="0 0 360 150" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="wp_${uid}" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(-16)">
+        <rect width="16" height="16" fill="#CFE5C7"/>
+        <rect width="8" height="16" fill="#C3DCBA"/>
+      </pattern>
+    </defs>
+    <rect width="360" height="150" fill="#EAEFEA"/>
+    <rect x="8" y="30" width="344" height="112" rx="14" fill="#E4ECE4" stroke="#D5DFD5" stroke-width="1"/>
+    <!-- 中央露台 + 石板通路 -->
+    <rect x="164" y="52" width="42" height="62" rx="8" fill="#DCE2DC" stroke="#CFD7CF" stroke-width="1"/>
+    <path d="M148 83 L218 83" fill="none" stroke="#FFFFFF" stroke-opacity="0.78" stroke-width="11" stroke-linecap="round"/>
+    <path d="M148 83 L218 83" fill="none" stroke="#8FA492" stroke-width="1.2" stroke-dasharray="4 4"/>
+    <!-- 草坪区 -->
+    <path d="${Z1}" fill="url(#wp_${uid})" stroke="#4D835C" stroke-width="1.2"/>
+    <path d="${Z2}" fill="url(#wp_${uid})" stroke="#4D835C" stroke-width="1.2"/>
+    <g font-family="var(--font-ui)" text-anchor="middle">
+      <text x="84" y="82" font-size="11.5" font-weight="700" fill="#1F4D32">区域 1</text>
+      <text x="84" y="96" font-size="9.5" font-weight="600" fill="#467358" class="num">118 ㎡</text>
+      <text x="279" y="82" font-size="11.5" font-weight="700" fill="#1F4D32">区域 2</text>
+      <text x="279" y="96" font-size="9.5" font-weight="600" fill="#467358" class="num">52 ㎡</text>
+    </g>
+    <!-- 充电桩与机器位置 -->
+    <g transform="translate(185 62)">
+      <rect x="-10" y="-10" width="20" height="20" rx="6" fill="#FFFFFF" stroke="#4D835C" stroke-opacity="0.35"/>
+      <image href="${IMG}device/icon_device_charge_station.png" x="-8" y="-8" width="16" height="16"/>
+    </g>
+    <g transform="translate(185 104)">
+      <circle r="14" fill="#FFFFFF" fill-opacity="0.92"/>
+      <image href="${IMG}device/device_selfcheck_product.png" x="-10" y="-13" width="20" height="26"/>
+    </g>
+  </svg>`;
+}
+
+/* ---------- 2. 完整庭院平面图（支持画框与全屏两种视口，彻底保证四边不裁切） ---------- */
+function renderCourtyardMap({ mowing, uid, mode = 'framed' }) {
+  const Z1 = 'M42 132 C 110 112, 238 110, 336 120 C 348 152, 348 202, 340 232 C 264 240, 126 242, 44 238 C 34 206, 34 164, 42 132Z';
+  const Z2 = 'M46 294 C 128 290, 220 290, 276 294 C 308 296, 336 302, 344 312 C 350 344, 348 382, 338 412 C 258 424, 130 426, 52 416 C 38 378, 38 334, 46 294Z';
+  const Z3 = 'M294 244 C 316 240, 338 242, 348 248 C 352 262, 352 276, 348 288 C 328 292, 308 292, 294 288 C 288 274, 288 260, 294 244Z';
+  const stripes = [];
+  for (let i = 0; i <= 10; i++) {
+    const y = 126 + i * 10;
+    const a = `40 ${y}`, b = `344 ${y - 6}`;
+    stripes.push(...(i % 2 ? [b, a] : [a, b]));
+  }
+  const robotPos = mowing ? [276, 190] : [80, 266];
+  const patId = `lawn_${uid}`, clipId = `clip_${uid}`;
+  // framed 用于方案 1/2 框内卡片；full 用于方案 3 全屏铺底（四边留白居中，彻底不裁边）
+  const vb = mode === 'full' ? '-6 -36 402 680' : '10 92 370 356';
+  const aspect = 'xMidYMid meet';
+  return `
+  <svg viewBox="${vb}" preserveAspectRatio="${aspect}">
+    <defs>
+      <pattern id="${patId}" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)">
+        <rect width="20" height="20" fill="#CFE5C7"/>
+        <rect width="10" height="20" fill="#C3DCBA"/>
+      </pattern>
+      <clipPath id="${clipId}"><path d="${Z1}"/></clipPath>
+    </defs>
+
+    <rect x="-40" y="-40" width="470" height="760" fill="#EAEFEA"/>
+    <rect x="20" y="96" width="350" height="346" rx="22" fill="#E4ECE4" stroke="#D4DFD4" stroke-width="1"/>
+    <!-- 露台参考 -->
+    <rect x="142" y="248" width="132" height="36" rx="8" fill="#DCE2DC" stroke="#CFD7CF" stroke-width="1"/>
+    <rect x="148" y="254" width="120" height="24" rx="5" fill="#E3E8E3"/>
+
+    <!-- 柔和底影 -->
+    <g transform="translate(0 3)" opacity="0.20">
+      <path d="${Z1}" fill="#3E5C45"/>
+      <path d="${Z2}" fill="#3E5C45"/>
+      <path d="${Z3}" fill="#3E5C45"/>
+    </g>
+
+    <!-- 石板连廊 -->
+    <path d="M84 234 L84 298" fill="none" stroke="#D4DCD3" stroke-width="18" stroke-linecap="round"/>
+    <path d="M84 234 L84 298" fill="none" stroke="#FFFFFF" stroke-opacity="0.74" stroke-width="13" stroke-linecap="round"/>
+    <path d="M84 234 L84 298" fill="none" stroke="#8FA492" stroke-width="1.4" stroke-dasharray="4 4" stroke-linecap="round"/>
+
+    <!-- 草坪本体 -->
+    <path d="${Z1}" fill="url(#${patId})"/>
+    <path d="${Z1}" fill="none" stroke="#FFFFFF" stroke-opacity="0.88" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="${Z1}" fill="none" stroke="#4D835C" stroke-width="1.1" stroke-linejoin="round"/>
+
+    <path d="${Z2}" fill="url(#${patId})"/>
+    <path d="${Z2}" fill="none" stroke="#FFFFFF" stroke-opacity="0.88" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="${Z2}" fill="none" stroke="#4D835C" stroke-width="1.1" stroke-linejoin="round"/>
+
+    <path d="${Z3}" fill="url(#${patId})"/>
+    <path d="${Z3}" fill="none" stroke="#FFFFFF" stroke-opacity="0.88" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="${Z3}" fill="none" stroke="#4D835C" stroke-width="1.1" stroke-linejoin="round"/>
+
+    ${mowing ? `<g clip-path="url(#${clipId})"><polyline points="${stripes.join(' ')}" fill="none" stroke="#1D7648" stroke-opacity="0.52" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>` : ''}
+
+    <g font-family="var(--font-ui)" text-anchor="middle">
+      ${mowing ? `<rect x="160" y="160" width="66" height="36" rx="8" fill="#E5F1E0" fill-opacity="0.86"/>` : ''}
+      <text x="193" y="176" font-size="13" font-weight="700" fill="#1F4D32">区域 1</text>
+      <text x="193" y="191" font-size="10" font-weight="600" fill="#467358" class="num">118 ㎡</text>
+      <text x="195" y="356" font-size="13" font-weight="700" fill="#1F4D32">区域 2</text>
+      <text x="195" y="371" font-size="10" font-weight="600" fill="#467358" class="num">52 ㎡</text>
+      <text x="321" y="270" font-size="11" font-weight="700" fill="#1F4D32">侧院</text>
+    </g>
+
+    <g transform="translate(116 266)">
+      <rect x="-12" y="-12" width="24" height="24" rx="7" fill="#FFFFFF" stroke="#4D835C" stroke-opacity="0.35" stroke-width="1"/>
+      <image href="${IMG}device/icon_device_charge_station.png" x="-10" y="-10" width="20" height="20"/>
+    </g>
+
+    <g transform="translate(${robotPos[0]} ${robotPos[1]}) rotate(${mowing ? 76 : 0})">
+      ${mowing ? `<path d="M-15 -22 L0 -48 L15 -22 Z" fill="#1D7648" fill-opacity="0.16"/>` : ''}
+      <circle r="19" fill="#FFFFFF" fill-opacity="0.92"/>
+      <image href="${IMG}device/device_selfcheck_product.png" x="-13" y="-18" width="26" height="36"/>
+    </g>
+  </svg>`;
+}
+
+/* =========================================================
+   新方案 1：X5 银翼展厅 · 实机+画中图
+   ========================================================= */
+function renderScheme1() {
+  const m = getStateMeta(), mowing = APP.st !== 'idle';
+  const showBigMap = mowing || APP.s1Expanded;
+  return `
+  <div class="hv-screen">
+    ${statusbar()}
+    <div class="s1-wrap">
+      <div class="s1-topbar">
+        <button class="s1-brand-select" data-act="toast" data-msg="切换设备（后院割草机 / 前院割草机）">
+          <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+          <span class="sep"></span>
+          <span class="dev"><span class="status-dot ${m.dot}"></span>后院割草机 ${ic('down', 'sm')}</span>
+        </button>
+        <div class="s1-seg-actions">
+          <button title="消息中心" data-act="toast" data-msg="消息中心（3 条未读）">${ic('msg', 'sm')}<span class="dot"></span></button>
+          <span class="vsep"></span>
+          <button title="设备设置" data-act="toast" data-msg="进入设备设置">${ic('gear', 'sm')}</button>
+        </div>
+      </div>
+
+      ${showBigMap ? `
+      <section class="s1-compact-strip">
+        <div class="thumb"><img src="${IMG}add/device_product_large.png" alt="X5"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;font-size:17px;font-weight:700;color:#14171C">
+            <span class="status-dot ${m.dot}"></span><span>${m.title}</span>
+          </div>
+          <div style="margin-top:2px;font-size:11px;color:#5B6470;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.sub}</div>
+        </div>
+        <div class="s1-bat-col">
+          <div class="s1-bat-num" style="line-height:1"><b class="num" style="font-size:22px">${m.bat}</b><span>%</span></div>
+          <button class="hv-sig-chip" style="height:22px" data-act="openModal" data-target="S1" data-kind="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+        </div>
+      </section>
+
+      <section class="s1-bigmap-card">
+        <div class="s1-bigmap-view">
+          ${renderCourtyardMap({ mowing, uid: 'S1_big', mode: 'framed' })}
+          ${!mowing ? `<button class="s1-expand-pill" style="left:8px;right:auto" data-act="toggleS1Map">${ic('back', 'sm')}返回实机展台</button>` : ''}
+          <div class="s1-map-badge" style="${!mowing ? 'left:auto;right:8px' : ''}"><span class="status-dot ok"></span>X5 · 170 ㎡</div>
+        </div>
+        ${mowing ? `
+        <div class="s1-bigmap-prog">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="font-weight:600;color:#2E6546">103 分区实时进度</span>
+            <strong class="num" style="color:#14171C">76 / 170 ㎡ · 45%</strong>
+          </div>
+          <div class="hv-mow-bar"><i style="width:45%"></i></div>
+        </div>` : ''}
+      </section>` : `
+      <section class="s1-showroom">
+        <div class="s1-slash-glow"></div>
+        <div class="s1-hero-head">
+          <div>
+            <div class="s1-status-title"><span class="status-dot ${m.dot}"></span><span>${m.title}</span></div>
+            <div class="s1-status-sub">${m.sub}</div>
+          </div>
+          <div class="s1-bat-col">
+            <div class="s1-bat-num"><b class="num">${m.bat}</b><span>%</span></div>
+            <button class="hv-sig-chip" data-act="openModal" data-target="S1" data-kind="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+          </div>
+        </div>
+
+        <div class="s1-mower-stage">
+          <img src="${IMG}add/device_product_large.png" alt="X5 实机">
+          <div class="shadow"></div>
+        </div>
+
+        <div class="s1-energy-rail">
+          <span class="spec-badge light"><i class="tri"></i><span>X5</span><span class="sep"></span><span class="num">004</span></span>
+          <div class="track"><div class="fill" style="width:${m.bat}%"></div></div>
+          <span style="font-size:11px;font-weight:700;color:#16794B" class="num">已就绪</span>
+        </div>
+      </section>
+
+      <section class="s1-map-card">
+        <div class="s1-map-inner">
+          ${renderWideMapPreview('S1_wide')}
+          <div class="s1-map-badge">后院庭院 · 2 区</div>
+          <button class="s1-expand-pill" data-act="toggleS1Map">${ic('expand', 'sm')}展开全图</button>
+        </div>
+      </section>`}
+
+      <div class="s1-dock-row">
+        ${mowing ? `
+          <button class="s1-cta-main" data-act="toast" data-msg="暂停作业（等设备确认）">${ic('pause', 'sm')}暂停作业</button>
+          <button class="s1-cta-sub" data-act="openModal" data-target="S1" data-kind="dock">${ic('dock', 'sm')}回桩</button>
+          <button class="s1-cta-sub" data-act="toast" data-msg="手动遥控（车体 / 地图双模式）">${ic('pad', 'sm')}遥控</button>
+        ` : `
+          <button class="s1-cta-main" data-act="setState" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+          <button class="s1-cta-sub" data-act="toast" data-msg="进入地图管理">${ic('map', 'sm')}地图</button>
+          <button class="s1-cta-sub" data-act="toast" data-msg="手动遥控（车体 / 地图双模式）">${ic('pad', 'sm')}遥控</button>
+        `}
+      </div>
+
+      <div class="s1-metrics-row">
+        <button class="s1-metric-box" data-act="toast" data-msg="调节刀盘高度（50 mm）"><div class="k">刀盘高度</div><div class="v num">50 mm</div></button>
+        <button class="s1-metric-box" data-act="toast" data-msg="安全传感器已全开"><div class="k">安全传感</div><div class="v">全开</div></button>
+        <button class="s1-metric-box" data-act="toast" data-msg="下次定时：周三 09:30"><div class="k">下次定时</div><div class="v num">周三 09:30</div></button>
+      </div>
+
+      <nav class="hv-light-tabs">
+        <button class="on">${ic('home')}<span>首页</span></button>
+        <button data-act="toast" data-msg="进入我的页面">${ic('user')}<span>我的</span></button>
+      </nav>
+    </div>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('S1')}
+  </div>`;
+}
+
+/* =========================================================
+   新方案 2：庭院 Bento 仪表板 · 画框式地图
+   ========================================================= */
+function renderScheme2() {
+  const m = getStateMeta(), mowing = APP.st !== 'idle';
+  const pct = Number(m.bat);
+  const circ = 2 * Math.PI * 25;
+  const dashOff = (circ * (1 - pct / 100)).toFixed(1);
+  return `
+  <div class="hv-screen">
+    ${statusbar()}
+    <div class="s2-wrap">
+      <div class="s2-topbar">
+        <button class="s2-dev-avatar" data-act="toast" data-msg="切换设备（后院割草机 / 前院割草机）">
+          <span class="ava-box"><img src="${IMG}add/device_product_large.png" alt="X5"></span>
+          <span>
+            <span class="t1">后院割草机 ${ic('down', 'sm')}</span>
+            <span class="t2"><span class="status-dot ${m.dot}"></span><span>在线 · T-MOW X5</span></span>
+          </span>
+        </button>
+        <div class="s2-plain-icons">
+          <button class="s2-plain-btn" data-act="toast" data-msg="消息中心（3 条未读）">${ic('msg')}<span class="dot"></span></button>
+          <button class="s2-plain-btn" data-act="toast" data-msg="进入设备设置">${ic('gear')}</button>
+        </div>
+      </div>
+
+      <!-- Card 1：瓷白核心遥测卡 + 环形电量表盘 -->
+      <section class="s2-tele-card">
+        <div class="s2-tele-left">
+          <div class="s2-tele-title"><span class="status-dot ${m.dot}"></span><span>${m.title}</span></div>
+          <div class="s2-tele-sub">${m.sub}</div>
+          ${mowing ? `
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:#2E6546;font-weight:600">103 实时进度</span>
+              <strong class="num" style="color:#14171C">76 / 170 ㎡ · 45%</strong>
+            </div>
+            <div class="hv-mow-bar"><i style="width:45%"></i></div>
+          </div>` : `
+          <div class="s2-mini-chips">
+            <button class="s2-mini-chip num" data-act="toast" data-msg="刀盘高度 50 mm">刀盘 50mm</button>
+            <button class="s2-mini-chip" data-act="toast" data-msg="安全传感器全开">传感全开</button>
+            <button class="s2-mini-chip num" data-act="toast" data-msg="下次定时：周三 09:30">周三 09:30</button>
+          </div>`}
+        </div>
+        <div class="s2-ring-col">
+          <div class="s2-ring-wrap">
+            <svg viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="25" fill="none" stroke="#EAEFF5" stroke-width="5"/>
+              <circle cx="30" cy="30" r="25" fill="none" stroke="#189558" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${dashOff}"/>
+            </svg>
+            <span class="s2-ring-val num">${m.bat}<small>%</small></span>
+          </div>
+          <button class="hv-sig-chip" data-act="openModal" data-target="S2" data-kind="signal">${sigBars(4)}<span>Wi-Fi</span></button>
+        </div>
+      </section>
+
+      <!-- Card 2：画框式庭院地图卡 + 底缘内嵌毛玻璃三格工具条 -->
+      <section class="s2-map-frame">
+        <div class="s2-map-viewport">
+          ${renderCourtyardMap({ mowing, uid: 'S2_frame', mode: 'framed' })}
+          <div class="s2-map-topchip"><span>后院 3 区 · 170 ㎡</span></div>
+          <div class="s2-map-bottom-bar">
+            <button data-act="toast" data-msg="镜头回到机器人位置">${ic('locate', 'sm')}定位设备</button>
+            <button data-act="toast" data-msg="手动遥控（车体 / 地图双模式）">${ic('pad', 'sm')}手动遥控</button>
+            <button data-act="toast" data-msg="进入地图管理">${ic('map', 'sm')}地图管理</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 3：对称双控操作栏 -->
+      <div class="s2-action-pair">
+        ${mowing ? `
+          <button class="s2-btn-primary" data-act="toast" data-msg="暂停作业（等设备确认）">${ic('pause', 'sm')}暂停作业</button>
+          <button class="s2-btn-secondary" data-act="openModal" data-target="S2" data-kind="dock">${ic('dock', 'sm')}返回充电桩</button>
+        ` : `
+          <button class="s2-btn-primary" data-act="setState" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+          <button class="s2-btn-secondary" data-act="toast" data-msg="查看 / 管理预约计划">${ic('cal', 'sm')}预约计划</button>
+        `}
+      </div>
+
+      <nav class="hv-light-tabs">
+        <button class="on">${ic('home')}<span>首页</span></button>
+        <button data-act="toast" data-msg="进入我的页面">${ic('user')}<span>我的</span></button>
+      </nav>
+    </div>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('S2')}
+  </div>`;
+}
+
+/* =========================================================
+   新方案 3：无界轻银地图 + 双轨悬浮控制岛
+   ========================================================= */
+function renderScheme3() {
+  const m = getStateMeta(), mowing = APP.st !== 'idle';
+  return `
+  <div class="hv-screen s3-screen">
+    ${statusbar()}
+    <div class="s3-map-full">${renderCourtyardMap({ mowing, uid: 'S3_full', mode: 'full' })}</div>
+    <div class="s3-top-fade"></div>
+    <div class="s3-bottom-fade"></div>
+
+    <!-- 全宽毛玻璃钛银一体顶栏 -->
+    <header class="s3-glass-topbar">
+      <button class="s3-top-left" data-act="toast" data-msg="切换设备（后院割草机 / 前院割草机）">
+        <img class="logo" src="${IMG}home/logo.png" alt="T-MOW">
+        <span class="sep"></span>
+        <span class="name"><span class="status-dot ${m.dot}"></span>后院割草机 ${ic('down', 'sm')}</span>
+      </button>
+      <div class="s3-top-right">
+        <span class="s3-inline-bat num">${m.bat}%</span>
+        <button class="s3-inline-wifi" data-act="openModal" data-target="S3" data-kind="signal">${sigBars(4)}</button>
+        <button class="s3-top-ico" data-act="toast" data-msg="消息中心（3 条未读）">${ic('msg', 'sm')}<span class="dot"></span></button>
+        <button class="s3-top-ico" data-act="toast" data-msg="进入设备设置">${ic('gear', 'sm')}</button>
+      </div>
+    </header>
+
+    <!-- 底部双轨轻银悬浮控制岛（右侧地图 100% 清空） -->
+    <section class="s3-island">
+      <div class="s3-upper-rail">
+        <button data-act="toast" data-msg="镜头回到机器人位置">${ic('locate', 'sm')}定位</button>
+        <button data-act="toast" data-msg="手动遥控（车体 / 地图双模式）">${ic('pad', 'sm')}遥控</button>
+        <button data-act="toast" data-msg="进入地图管理">${ic('map', 'sm')}地图</button>
+        <button class="num" data-act="toast" data-msg="调节刀盘高度（50 mm）">${ic('blade', 'sm')}50 mm</button>
+      </div>
+      <div class="s3-lower-split">
+        <div class="s3-left-info">
+          <span class="s3-slant-mark"></span>
+          <div style="flex:1;min-width:0">
+            <div class="s3-status-h"><span class="status-dot ${m.dot}"></span><span>${m.title}</span></div>
+            ${mowing ? `
+              <div style="margin-top:5px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+                  <span style="color:#2E6546;font-weight:600">103 进度</span>
+                  <strong class="num" style="color:#14171C">76/170㎡ · 45%</strong>
+                </div>
+                <div class="hv-mow-bar"><i style="width:45%"></i></div>
+              </div>` : `
+              <div class="s3-status-p">已满电 · 下次周三 09:30</div>`}
+          </div>
+        </div>
+        <div class="s3-right-cta">
+          ${mowing ? `
+            <button class="s3-compact-start" style="padding:0 13px" data-act="toast" data-msg="暂停作业">${ic('pause', 'sm')}暂停</button>
+            <button class="s3-compact-sq" title="回桩" data-act="openModal" data-target="S3" data-kind="dock">${ic('dock', 'sm')}</button>
+          ` : `
+            <button class="s3-compact-start" data-act="setState" data-st="mowing">${ic('play', 'sm')}开始割草</button>
+          `}
+        </div>
+      </div>
+    </section>
+
+    <!-- 悬浮浅瓷白胶囊底栏 -->
+    <nav class="s3-float-pill">
+      <button class="on">${ic('home', 'sm')}<span>首页</span></button>
+      <button data-act="toast" data-msg="进入我的页面">${ic('user', 'sm')}<span>我的</span></button>
+    </nav>
+
+    ${APP.st === 'blocked' ? renderBlockedModal() : ''}
+    ${renderSharedModal('S3')}
+  </div>`;
+}
+
+/* ---------- 公共交互弹窗（信号详情 id:12 / 107 回桩 / bit7 阻挡） ---------- */
+function renderBlockedModal() {
+  return `
+  <div class="overlay-scrim">
+    <div class="modal-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="width:38px;height:38px;border-radius:10px;background:var(--state-warn-bg);color:var(--state-warn);display:inline-flex;align-items:center;justify-content:center">${ic('alert')}</span>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#14171C">工作区域阻挡，无法继续</div>
+          <div style="font-size:12px;color:#5B6470">fault bit7 激活 · 必须选择处理出口</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+        <button class="p-btn p-btn-primary" style="width:100%" data-act="setState" data-st="mowing">跳过当前区域（122）</button>
+        <button class="p-btn p-btn-secondary" style="width:100%" data-act="setState" data-st="mowing">已清障，原区域恢复（105）</button>
+        <button class="p-btn p-btn-danger-soft" style="width:100%" data-act="setState" data-st="idle">结束本次任务（106）</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSharedModal(who) {
+  if (!APP.modal || APP.modal.target !== who) return '';
+  if (APP.modal.kind === 'signal') {
+    return `
+    <div class="overlay-scrim" data-act="closeModal">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:16px;font-weight:700;color:#14171C">信号与网络详情（id:12）</span>
+          <button class="icon-hit" style="width:32px;height:32px" data-act="closeModal">${ic('close', 'sm')}</button>
+        </div>
+        <div class="list-card" style="margin-bottom:14px">
+          <div class="list-row"><span class="row-body"><span class="row-title">当前网络通道</span></span><span class="s-pill ok">Wi-Fi · Home-5G</span></div>
+          <div class="list-row"><span class="row-body"><span class="row-title">信号强度</span></span><span class="num" style="font-weight:700">88%</span></div>
+          <div class="list-row"><span class="row-body"><span class="row-title">上行 / 下行速率</span></span><span class="num" style="font-size:12px;color:#5B6470">↑ 124 · ↓ 318 kB/s</span></div>
+        </div>
+        <button class="p-btn p-btn-primary" style="width:100%" data-act="closeModal">关闭</button>
+      </div>
+    </div>`;
+  }
+  if (APP.modal.kind === 'dock') {
+    return `
+    <div class="overlay-scrim" data-act="closeModal">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div style="font-size:16px;font-weight:700;color:#14171C;margin-bottom:6px">确认返回充电桩？（107）</div>
+        <div style="font-size:12px;color:#5B6470;margin-bottom:14px">可选择回桩时是否清除当前割草任务。</div>
+        <div class="list-card" style="margin-bottom:16px">
+          <div class="list-row" data-act="toggleDockClear">
+            <div class="row-body"><div class="row-title">结束当前任务</div><div class="row-sub">清除进度，充电后不续割</div></div>
+            <span class="p-switch ${APP.dockClear ? 'on' : ''}"></span>
+          </div>
+          <div class="list-row" style="${APP.dockClear ? 'opacity:.45' : ''}" data-act="toggleDockAuto">
+            <div class="row-body"><div class="row-title">充电完成后自动恢复</div><div class="row-sub">与结束当前任务互斥</div></div>
+            <span class="p-switch ${APP.dockAuto ? 'on' : ''}"></span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="p-btn p-btn-secondary" style="flex:1" data-act="closeModal">取消</button>
+          <button class="p-btn p-btn-primary" style="flex:1" data-act="setState" data-st="idle">确认回桩</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  return '';
+}
+
+function renderAll() {
+  const cols = [
+    { name: '新方案 1 · X5 银翼展厅', sub: '实机主视觉 + 宽幅画中图', html: renderScheme1() },
+    { name: '新方案 2 · Bento 仪表板', sub: '环形电量 + 画框地图 + 底缘工具条', html: renderScheme2() },
+    { name: '新方案 3 · 轻银地图双轨坞', sub: '一体顶栏 + 横向工具带 + 非对称主控', html: renderScheme3() },
+  ];
+  document.getElementById('grid').innerHTML = cols.map(c => `
+    <section class="variant-col">
+      <div class="variant-meta">
+        <span class="name">${c.name}</span>
+        <span class="sub">${c.sub}</span>
+      </div>
+      <div class="device-chassis">${c.html}</div>
+    </section>
+  `).join('');
+
+  document.querySelectorAll('#stateCtrl button').forEach(b => b.classList.toggle('on', b.dataset.st === APP.st));
+}
+
+let toastT = null;
+function showToast(msg) {
+  document.querySelector('.proto-toast')?.remove();
+  clearTimeout(toastT);
+  const el = document.createElement('div');
+  el.className = 'proto-toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastT = setTimeout(() => el.remove(), 2200);
+}
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-st],[data-act]');
+  if (!btn) return;
+  if (btn.dataset.act === 'setState') { APP.st = btn.dataset.st; APP.modal = null; return renderAll(); }
+  if (btn.dataset.st) { APP.st = btn.dataset.st; APP.modal = null; return renderAll(); }
+
+  const act = btn.dataset.act;
+  if (act === 'toggleS1Map') { APP.s1Expanded = !APP.s1Expanded; renderAll(); }
+  else if (act === 'openModal') { APP.modal = { target: btn.dataset.target, kind: btn.dataset.kind }; renderAll(); }
+  else if (act === 'closeModal') { APP.modal = null; renderAll(); }
+  else if (act === 'toggleDockClear') {
+    APP.dockClear = !APP.dockClear;
+    if (APP.dockClear) APP.dockAuto = false;
+    renderAll();
+  }
+  else if (act === 'toggleDockAuto') {
+    if (!APP.dockClear) { APP.dockAuto = !APP.dockAuto; renderAll(); }
+  }
+  else if (act === 'toast') { showToast(btn.dataset.msg || '操作已触发'); }
+});
+
+renderAll();
+</script>
+</body>
+</html>
